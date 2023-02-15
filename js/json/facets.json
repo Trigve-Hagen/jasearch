@@ -1,0 +1,40 @@
+[
+    {
+        "name": "Active",
+        "type": "radio",
+        "elementClasses": "form-check-input",
+        "options": [
+            "True",
+            "False"
+        ],
+        "labelClasses": "form-check-label",
+        "prefix": "<div class=\"form-check\">",
+        "suffix": "</div>"
+    },
+    {
+        "name": "Gender",
+        "type": "select",
+        "elementClasses": "form-select form-select-md mb-3",
+        "options": [
+            "Male",
+            "Female"
+        ],
+        "labelClasses": "na",
+        "prefix": "na",
+        "suffix": "na"
+    },
+    {
+        "name": "Eye Color",
+        "type": "checkbox",
+        "elementClasses": "form-check-input",
+        "options": [
+            "Brown",
+            "Black",
+            "Green",
+            "Blue"
+        ],
+        "labelClasses": "form-check-label",
+        "prefix": "<div class=\"form-check\">",
+        "suffix": "</div>"
+    }
+]
