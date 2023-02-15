@@ -13,7 +13,7 @@ js
 index.html  
 README.md  
 
-Related Links
+Related Links  
 <a href="http://www.adequatelygood.com/JavaScript-Module-Pattern-In-Depth.html" target="_blank">JavaScript-Module-Pattern-In-Depth</a>  
 <a href="https://www.taniarascia.com/javascript-mvc-todo-app/" target="_blank">Build a Simple MVC App</a>  
 <a href="https://livebook.manning.com/book/get-programming-with-javascript" target="_blank">get-programming-with-javascript</a>

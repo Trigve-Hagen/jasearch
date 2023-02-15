@@ -1,34 +1,20 @@
 var SearchView = (function (SearchHelpers) {
     var view = {}
 
-
-    view.facets = getElement('#rsearch-facets')
-
-    /* view.todoList = createElement('ul', 'todo-list')
-    view.results.append(view.todoList)
-    my.container = createElement('div', 'container')
-    my.row = createElement('div', 'row')
-    my.sidebar = createElement('div', 'col-12 col-md-3')
-    my.content = createElement('div', 'col-12 col-md-9')
-    my.form = createElement('form')
-    my.searchbox = createElement('div', 'input-group mb-3')
-    my.input = createElement('input', 'form-control')
-    my.input.type = 'text'
-    my.input.placeholder = 'Search with MySearch'
-    my.input.name = 'mysearch-search'
-    my.submitButton = createElement('button', 'btn btn-outline-secondary')
-    my.submitButton.textContent = 'Search'
-    my.searchbox.append(my.input, my.submitButton)
-    my.form.append(my.searchbox)
-    my.title = createElement('h1')
-    my.title.textContent = 'Search'
-    my.nodeList = createElement('ul', 'results')
-    my.results.append(my.container)
-    my.container.append(my.row)
-    my.row.append(my.sidebar)
-    my.row.append(my.content)
-    my.content.append(my.title, my.form, my.nodeList) */
-
+    /**
+     * Creates checkbox, radio and select form elements.
+     *
+     * Creates facet form elements from the JSON data provided.
+     *
+     * @param string type
+     *   The type of element to ceate. Checkbox, radio or select.
+     * @param string template
+     *   The template created in index.html.
+     * @param object data
+     *   An oject from JSON containing the facet data.
+     * 
+     * @return string template
+     */
     function createFormElement(type, template, data) {
         var placeholder = "{{ element }}"
         var id = SearchHelpers.createId(data.name)
@@ -57,6 +43,17 @@ var SearchView = (function (SearchHelpers) {
         return template
     }
 
+    /**
+     * Private helper function
+     * Fills in template placeholders by calling replace function.
+     *
+     * @param string template
+     *   The template created in index.html.
+     * @param object data
+     *   An oject from JSON containing the facet data.
+     * 
+     * @return string template
+     */
     function fillTemplate(template, data) {
         switch (data.type) {
             case 'select': template = createFormElement(data.type, template, data); break;
@@ -74,6 +71,15 @@ var SearchView = (function (SearchHelpers) {
         return template
     }
 
+    /**
+     * Private helper function
+     * Creates Facet checkbox, radio and select form element change events.
+     *
+     * @param string type
+     *   The type of element to ceate. Checkbox, radio or select.
+     * @param object data
+     *   An oject from JSON containing the facet data.
+     */
     function createFacetEvent(type, data) {
         var id = SearchHelpers.createId(data.name)
         if (type == 'select') {
@@ -91,6 +97,15 @@ var SearchView = (function (SearchHelpers) {
         }
     }
 
+    /**
+     * Public function
+     * Creates Facet checkbox, radio and select form element change events.
+     *
+     * @param string type
+     *   The type of element to ceate. Checkbox, radio or select.
+     * @param object data
+     *   An oject from JSON containing the facet data.
+     */
     view.createFacetEvents = function (data) {
         data.forEach(function (element) {
             switch (element.type) {
@@ -101,6 +116,17 @@ var SearchView = (function (SearchHelpers) {
         })
     }
 
+    /**
+     * Public function
+     * Fills in a list of templates using replace function.
+     *
+     * @param string template
+     *   The template created in index.html.
+     * @param JSON dataArray
+     *   JSON containing search results or facet data.
+     * 
+     * @return string list of populated templates
+     */
     view.fillList = function (template, dataArray) {
         var listString = ""
         dataArray.forEach(function (data) {
@@ -110,30 +136,18 @@ var SearchView = (function (SearchHelpers) {
         return listString
     }
 
+    /**
+     * Public function
+     * Displays list of templates.
+     *
+     * @param string resultsList
+     *   The list of templates to display.
+     * @param string id
+     *   The id of the div to display the templates in.
+     */
     view.displayList = function (resultsList, id) {
-        var results = getElement(id)
+        var results = document.getElementById(id)
         results.innerHTML = resultsList
-    }
-
-    function createElement(tag, className) {
-        const element = document.createElement(tag)
-
-        if (className) {
-            var parts = className.split(' ')
-            if (parts.length > 1) {
-                for (var i = 0; i < parts.length; i++) {
-                    element.classList.add(parts[i])
-                }
-            } else element.classList.add(className)
-        }
-
-        return element
-    }
-
-    function getElement(selector) {
-        const element = document.querySelector(selector)
-
-        return element
     }
 
     return view;

@@ -4,11 +4,11 @@
         SearchView.displayList(SearchView.fillList(
             args.resultsTemplate,
             SearchModel.getData(args.resultsPath)
-        ), '#search-results')
+        ), 'search-results')
         SearchView.displayList(SearchView.fillList(
             args.facetsTemplate,
             facetData
-        ), '#search-facets')
+        ), 'search-facets')
         SearchView.createFacetEvents(facetData);
     }
 }(jQuery, SearchModel, SearchView, SearchHelpers))
