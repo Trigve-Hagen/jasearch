@@ -86,23 +86,31 @@ var SearchView = (function (SearchModel, SearchHelpers) {
         if (type == 'select') {
             var selectElm = document.getElementById(id)
             selectElm.addEventListener('change', event => {
-                console.log(event.target.value)
+                // console.log(event.target.value)
                 var facetsData = SearchModel.getData(facetsPath)
                 var searchData = SearchModel.getData(searchPath)
                 var filteredData = []
-                /* facetsData.forEach(function (item) {
-                    item.options.forEach(function (option) {
-                        console.log(SearchHelpers.createId(option) + " - " + event.target.value)
-                        if (SearchHelpers.createId(option) == SearchHelpers.createId(event.target.value)) {
-                            //filteredData.push(item)
+                facetsData.forEach(function (facetItem) {
+                    facetItem.options.forEach(function (option) {
+                        // console.log(option + " - " + event.target.value)
+                        if (SearchHelpers.createId(option) == event.target.value) {
+                            searchData.forEach(function (searchItem) {
+                                var keys = Object.keys(searchItem);
+                                keys.forEach(function (key) {
+                                    // console.log(SearchHelpers.createId(facetItem.name) + " - " + key)
+                                    if (SearchHelpers.createId(facetItem.name) == key && searchItem[SearchHelpers.createId(facetItem.name)] == event.target.value) {
+                                        filteredData.push(searchItem)
+                                    }
+                                })
+                            })
                         }
                     })
                 })
-                console.log(JSON.stringify(filteredData))
+                // console.log(JSON.stringify(filteredData))
                 view.displayList(view.fillList(
                     view.getTemplate("resultsTemplate"),
                     filteredData
-                ), 'search-results') */
+                ), 'search-results')
             })
         } else {
             data.options.forEach(function (item) {
@@ -112,6 +120,24 @@ var SearchView = (function (SearchModel, SearchHelpers) {
                 })
             })
         }
+    }
+
+    /**
+     * Public function
+     * Creates search form submit event.
+     *
+     * @param string type
+     *   The type of element to ceate. Checkbox, radio or select.
+     * @param JSON data
+     *   JSON containing facet data.
+     */
+    view.createSearchEvent = function (data) {
+        var searchBtn = document.getElementById("search-submit")
+        var searchInput = document.getElementById("search-input")
+        searchBtn.addEventListener('click', event => {
+            event.preventDefault()
+            console.log(searchInput.value)
+        })
     }
 
     /**
@@ -130,6 +156,10 @@ var SearchView = (function (SearchModel, SearchHelpers) {
                 case 'checkbox': template = createFacetEvent(element.type, element); break;
                 case 'radio': template = createFacetEvent(element.type, element); break;
             }
+        })
+        var resetElm = document.getElementById("reset-facets")
+        resetElm.addEventListener('click', event => {
+            console.log(event.target.id)
         })
     }
 
