@@ -71,56 +71,47 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
     crossorigin="anonymous"></script>
+  <script type="text/template" id="resultsTemplate">
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 col-md-3">
+            <img src="{{ picture }}" class="img-fluid" />
+          </div>
+          <div class="col-12 col-md-5">
+            <h4 class="mb-0">{{ name }}</h4>
+            <p class="mb-0"><b>Active:</b> {{ isActive }}</p>
+            <p class="mb-0"><b>Gender:</b> {{ gender }}</p>
+            <p class="mb-0"><b>Eye Color:</b> {{ eyeColor }}</p>
+            <p><b>About:</b> {{ about }}</p>
+          </div>
+          <div class="col-12 col-md-4">
+            <p class="mb-0"><b>Company:</b> {{ company }}</p>
+            <p class="mb-0"><b>Email:</b> {{ email }}</p>
+            <p class="mb-0"><b>Phone:</b> {{ phone }}</p>
+            <p class="mb-0"><b>Address:</b> {{ address }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+  <script type="text/template" id="facetsTemplate">
+    <div class="row mb-3">
+      <div class="col-12">
+        <p class="mb-0"><b>{{ name }}</b></p>
+        {{ element }}
+      </div>
+    </div>
+  </script>
   <script src="js/search-helpers.js"></script>
   <script src="js/search-model.js"></script>
   <script src="js/search-view.js"></script>
   <script src="js/search-facets.js"></script>
   <script type="text/javascript">
+    var searchPath = "http://mysearch.local/js/json/results.json"
+    var facetsPath = "http://mysearch.local/js/json/facets.json"
     jQuery(document).ready(
-      jQuery().initializeSearch({
-        resultsType: 'json', /* options = .json, .md */
-        resultsPath: 'http://mysearch.local/js/json/results.json',
-        resultsTopMargin: 30,
-        resultsBottomMargin: 50,
-        resultsMarginBetween: 20,
-        resultsTemplate: `
-          <div class="card mb-3">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-12 col-md-3">
-                  <img src="{{ picture }}" class="img-fluid" />
-                </div>
-                <div class="col-12 col-md-5">
-                  <h4 class="mb-0">{{ name }}</h4>
-                  <p class="mb-0"><b>Active:</b> {{ isActive }}</p>
-                  <p class="mb-0"><b>Gender:</b> {{ gender }}</p>
-                  <p class="mb-0"><b>Eye Color:</b> {{ eyeColor }}</p>
-                  <p><b>About:</b> {{ about }}</p>
-                </div>
-                <div class="col-12 col-md-4">
-                  <p class="mb-0"><b>Company:</b> {{ company }}</p>
-                  <p class="mb-0"><b>Email:</b> {{ email }}</p>
-                  <p class="mb-0"><b>Phone:</b> {{ phone }}</p>
-                  <p class="mb-0"><b>Address:</b> {{ address }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        `,
-        facetsType: 'json',
-        facetsPath: 'http://mysearch.local/js/json/facets.json',
-        facetsTopMargin: 30,
-        facetsBottomMargin: 50,
-        facetsMarginBetween: 10,
-        facetsTemplate: `
-          <div class="row mb-3">
-            <div class="col-12">
-              <p class="mb-0"><b>{{ name }}</b></p>
-              {{ element }}
-            </div>
-          </div>
-        `
-      })
+      jQuery().initializeSearch()
     )
   </script>
 </body>

@@ -1,7 +1,8 @@
-var SearchView = (function (SearchHelpers) {
+var SearchView = (function (SearchModel, SearchHelpers) {
     var view = {}
 
     /**
+     * Private helper function
      * Creates checkbox, radio and select form elements.
      *
      * Creates facet form elements from the JSON data provided.
@@ -86,6 +87,22 @@ var SearchView = (function (SearchHelpers) {
             var selectElm = document.getElementById(id)
             selectElm.addEventListener('change', event => {
                 console.log(event.target.value)
+                var facetsData = SearchModel.getData(facetsPath)
+                var searchData = SearchModel.getData(searchPath)
+                var filteredData = []
+                /* facetsData.forEach(function (item) {
+                    item.options.forEach(function (option) {
+                        console.log(SearchHelpers.createId(option) + " - " + event.target.value)
+                        if (SearchHelpers.createId(option) == SearchHelpers.createId(event.target.value)) {
+                            //filteredData.push(item)
+                        }
+                    })
+                })
+                console.log(JSON.stringify(filteredData))
+                view.displayList(view.fillList(
+                    view.getTemplate("resultsTemplate"),
+                    filteredData
+                ), 'search-results') */
             })
         } else {
             data.options.forEach(function (item) {
@@ -103,8 +120,8 @@ var SearchView = (function (SearchHelpers) {
      *
      * @param string type
      *   The type of element to ceate. Checkbox, radio or select.
-     * @param object data
-     *   An oject from JSON containing the facet data.
+     * @param JSON data
+     *   JSON containing facet data.
      */
     view.createFacetEvents = function (data) {
         data.forEach(function (element) {
@@ -131,7 +148,6 @@ var SearchView = (function (SearchHelpers) {
         var listString = ""
         dataArray.forEach(function (data) {
             listString += fillTemplate(template, data)
-            console.log(data.type)
         })
         return listString
     }
@@ -150,5 +166,20 @@ var SearchView = (function (SearchHelpers) {
         results.innerHTML = resultsList
     }
 
+    /**
+     * Public function
+     * Gets the template html.
+     * 
+     * Templates are stored in a script tag with type type="text/template"
+     * in index.html.
+     *
+     * @param string id
+     *   The id of the script that holds the templates.
+     */
+    view.getTemplate = function (id) {
+        var template = document.getElementById(id);
+        return template.innerHTML;
+    }
+
     return view;
-}(SearchHelpers));
+}(SearchModel, SearchHelpers));
