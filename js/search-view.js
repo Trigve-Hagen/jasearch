@@ -1,4 +1,4 @@
-var SearchView = (function (SearchModel, SearchHelpers) {
+var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     var view = {}
 
     /**
@@ -18,7 +18,7 @@ var SearchView = (function (SearchModel, SearchHelpers) {
      */
     function createFormElement(type, template, data) {
         var placeholder = "{{ element }}"
-        var id = SearchHelpers.createId(data.name)
+        var id = SearchHelpers.toCamelCase(data.name)
         var elementHtml = "<form>";
         if (type == 'select') {
             elementHtml += '<select name="' + id + '" id="' + id + '" class="' + data.elementClasses + '">';
@@ -92,34 +92,40 @@ var SearchView = (function (SearchModel, SearchHelpers) {
      *   An oject from JSON containing the facet data.
      */
     function createFacetEvent(type, data) {
-        var id = SearchHelpers.createId(data.name)
+        var id = SearchHelpers.toCamelCase(data.name)
+        // Get fresh data
+        var facetsData = SearchModel.getData(facetsPath)
+        var searchData = SearchModel.getData(searchPath)
+
         if (type == 'select') {
             var selectElm = document.getElementById(id)
             selectElm.addEventListener('change', event => {
-
-                // Get fresh data
-                var facetsData = SearchModel.getData(facetsPath)
-                var searchData = SearchModel.getData(searchPath)
-
                 // fliter the data
                 var filteredData = []
                 facetsData.forEach(function (facetItem) {
                     facetItem.options.forEach(function (option) {
-                        // console.log(option + " - " + event.target.value)
+                        //console.log(option + " - " + event.target.value)
                         if (SearchHelpers.createId(option) == event.target.value) {
                             searchData.forEach(function (searchItem) {
                                 var keys = Object.keys(searchItem);
                                 keys.forEach(function (key) {
-                                    // console.log(SearchHelpers.createId(facetItem.name) + " - " + key)
+                                    console.log(SearchHelpers.createId(facetItem.name) + " - " + key)
                                     if (SearchHelpers.createId(facetItem.name) == key && searchItem[SearchHelpers.createId(facetItem.name)] == event.target.value) {
                                         filteredData.push(searchItem)
+                                        var queId = SearchHelpers.createId(facetItem.name) + "-" + SearchHelpers.createId(option)
+                                        if (!SearchOrder.ifExists(queId)) {
+                                            SearchOrder.addItem({
+                                                "id": queId,
+                                                "type": "select"
+                                            })
+                                        }
                                     }
                                 })
                             })
                         }
                     })
                 })
-
+                console.log(SearchOrder.searchQue)
                 // display the filtered data
                 view.displayList(view.fillList(
                     view.getTemplate("resultsTemplate"),
@@ -130,7 +136,37 @@ var SearchView = (function (SearchModel, SearchHelpers) {
             data.options.forEach(function (item) {
                 var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                 selectElm.addEventListener('click', event => {
-                    console.log(event.target.id)
+                    var filteredData = []
+                    facetsData.forEach(function (facetItem) {
+                        facetItem.options.forEach(function (option) {
+                            // console.log(SearchHelpers.createId(option) + " - " + SearchHelpers.getFilterOption(event.target.id))
+                            if (SearchHelpers.createId(option) == SearchHelpers.getFilterOption(event.target.id)) {
+                                searchData.forEach(function (searchItem) {
+                                    var keys = Object.keys(searchItem);
+                                    keys.forEach(function (key) {
+                                        // console.log(SearchHelpers.toCamelCase(facetItem.name) + " - " + key)
+                                        // console.log(searchItem[SearchHelpers.toCamelCase(facetItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
+                                        if (SearchHelpers.toCamelCase(facetItem.name) == key && searchItem[SearchHelpers.toCamelCase(facetItem.name)] == SearchHelpers.getFilterOption(event.target.id)) {
+                                            filteredData.push(searchItem)
+                                            var queId = SearchHelpers.toCamelCase(facetItem.name) + "-" + SearchHelpers.createId(option)
+                                            if (!SearchOrder.ifExists(queId)) {
+                                                SearchOrder.addItem({
+                                                    "id": queId,
+                                                    "type": "button"
+                                                })
+                                            }
+                                        }
+                                    })
+                                })
+                            }
+                        })
+                    })
+                    console.log(SearchOrder.searchQue)
+                    // display the filtered data
+                    view.displayList(view.fillList(
+                        view.getTemplate("resultsTemplate"),
+                        filteredData
+                    ), 'search-results')
                 })
             })
         } else {
@@ -230,4 +266,4 @@ var SearchView = (function (SearchModel, SearchHelpers) {
     }
 
     return view;
-}(SearchModel, SearchHelpers));
+}(SearchModel, SearchOrder, SearchHelpers));

@@ -9,11 +9,61 @@ var SearchHelpers = (function () {
      *
      * @param string text
      *   The text to create the id from.
+     * 
+     * @return string
+     *   The string convered to name-option
      */
     helper.createId = function (text) {
         var parts = text.toLowerCase().split(" ")
         var id = parts.join("-")
         return id
+    }
+
+    /**
+     * Public function
+     * Camel cases a name.
+     * 
+     * camelCase
+     *
+     * @param string str
+     *   The text to create the id from.
+     * 
+     * @return string
+     *   The camelCase string
+     */
+    helper.toCamelCase = function (str) {
+        return str
+            .replace(/\s(.)/g, function ($1) { return $1.toUpperCase(); })
+            .replace(/\s/g, '')
+            .replace(/^(.)/, function ($1) { return $1.toLowerCase(); });
+    }
+
+    /**
+     * Public function
+     * Splits the id to get the name of the filter.
+     * 
+     * @param string id
+     *   The id of the filter. name-option
+     * 
+     * @return string
+     *   The filter name.
+     */
+    helper.getFilterName = function (id) {
+        return id.split("-")[0]
+    }
+
+    /**
+     * Public function
+     * Splits the id to get the option of the filter.
+     * 
+     * @param string id
+     *   The id of the filter. name-option
+     * 
+     * @return string
+     *   The filter option.
+     */
+    helper.getFilterOption = function (id) {
+        return id.split("-")[1]
     }
 
     return helper;
