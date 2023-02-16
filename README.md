@@ -1,5 +1,5 @@
 # JASearch
-A javaScript library for searching content using AJAX calls that return JSON. Also has support for facets using JSON.
+A javaScript library for searching content using AJAX calls that return JSON. Also has support for facets using JSON. Under construction.
 
 img  
 js  

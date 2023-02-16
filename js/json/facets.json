@@ -1,6 +1,6 @@
 [
     {
-        "name": "Active",
+        "name": "Is Active",
         "type": "radio",
         "elementClasses": "form-check-input",
         "options": [
