@@ -36,5 +36,18 @@
         "labelClasses": "form-check-label",
         "prefix": "<div class=\"form-check\">",
         "suffix": "</div>"
+    },
+    {
+        "name": "Favorite Fruit",
+        "type": "button",
+        "elementClasses": "btn btn-secondary",
+        "options": [
+            "Apple",
+            "Banana",
+            "Strawberry"
+        ],
+        "labelClasses": "na",
+        "prefix": "<div class=\"col-12 mt-3 d-grid gap-2 text-center\">",
+        "suffix": "</div>"
     }
 ]

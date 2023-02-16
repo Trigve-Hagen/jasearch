@@ -26,12 +26,21 @@ var SearchView = (function (SearchModel, SearchHelpers) {
                 elementHtml += '<option value="' + SearchHelpers.createId(item) + '" /> ' + item + '</option>';
             })
             elementHtml += '</select>';
+        } else if (type == "button") {
+            var prefix = data.prefix != "na" ? data.prefix : ""
+            var suffix = data.suffix != "na" ? data.suffix : ""
+            data.options.forEach(function (item) {
+                var optionId = id + "-" + SearchHelpers.createId(item)
+                elementHtml += prefix
+                elementHtml += '<button type="button" id="' + optionId + '" class="' + data.elementClasses + '" /> ' + item + '</button>';
+                elementHtml += suffix
+            })
         } else {
             var prefix = data.prefix != "na" ? data.prefix : ""
             var suffix = data.suffix != "na" ? data.suffix : ""
             var labelClasses = data.labelClasses != "na" ? data.labelClasses : ""
             data.options.forEach(function (item) {
-                optionId = id + "-" + SearchHelpers.createId(item)
+                var optionId = id + "-" + SearchHelpers.createId(item)
                 elementHtml += prefix;
                 elementHtml += '<input type="' + type + '" class="' + data.elementClasses + '" name="' + id + '" id="' + optionId + '" />'
                 elementHtml += '<label class="' + labelClasses + '" for=' + optionId + '">' + item + '</label>';
@@ -60,6 +69,7 @@ var SearchView = (function (SearchModel, SearchHelpers) {
             case 'select': template = createFormElement(data.type, template, data); break;
             case 'checkbox': template = createFormElement(data.type, template, data); break;
             case 'radio': template = createFormElement(data.type, template, data); break;
+            case 'button': template = createFormElement(data.type, template, data); break;
         }
         Object.keys(data).forEach(function (key) {
             var placeholder = "{{ " + key + " }}"
@@ -86,9 +96,12 @@ var SearchView = (function (SearchModel, SearchHelpers) {
         if (type == 'select') {
             var selectElm = document.getElementById(id)
             selectElm.addEventListener('change', event => {
-                // console.log(event.target.value)
+
+                // Get fresh data
                 var facetsData = SearchModel.getData(facetsPath)
                 var searchData = SearchModel.getData(searchPath)
+
+                // fliter the data
                 var filteredData = []
                 facetsData.forEach(function (facetItem) {
                     facetItem.options.forEach(function (option) {
@@ -106,11 +119,19 @@ var SearchView = (function (SearchModel, SearchHelpers) {
                         }
                     })
                 })
-                // console.log(JSON.stringify(filteredData))
+
+                // display the filtered data
                 view.displayList(view.fillList(
                     view.getTemplate("resultsTemplate"),
                     filteredData
                 ), 'search-results')
+            })
+        } else if (type == "button") {
+            data.options.forEach(function (item) {
+                var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                selectElm.addEventListener('click', event => {
+                    console.log(event.target.id)
+                })
             })
         } else {
             data.options.forEach(function (item) {
@@ -126,10 +147,8 @@ var SearchView = (function (SearchModel, SearchHelpers) {
      * Public function
      * Creates search form submit event.
      *
-     * @param string type
-     *   The type of element to ceate. Checkbox, radio or select.
      * @param JSON data
-     *   JSON containing facet data.
+     *   JSON containing search results data.
      */
     view.createSearchEvent = function (data) {
         var searchBtn = document.getElementById("search-submit")
@@ -144,8 +163,6 @@ var SearchView = (function (SearchModel, SearchHelpers) {
      * Public function
      * Creates Facet checkbox, radio and select form element change events.
      *
-     * @param string type
-     *   The type of element to ceate. Checkbox, radio or select.
      * @param JSON data
      *   JSON containing facet data.
      */
@@ -155,6 +172,7 @@ var SearchView = (function (SearchModel, SearchHelpers) {
                 case 'select': template = createFacetEvent(element.type, element); break;
                 case 'checkbox': template = createFacetEvent(element.type, element); break;
                 case 'radio': template = createFacetEvent(element.type, element); break;
+                case 'button': template = createFacetEvent(element.type, element); break;
             }
         })
         var resetElm = document.getElementById("reset-facets")
