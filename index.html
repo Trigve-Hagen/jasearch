@@ -61,12 +61,12 @@
             <h5 class="my-3">Filters</h5>
           </div>
           <div class="col-6 text-end">
-            <button type="button" class="btn btn-outline-success mt-3" id="reset-facets">Reset Filters</button>
+            <button type="button" class="btn btn-outline-success mt-3" id="reset-filters">Reset Filters</button>
           </div>
         </div>
 
         <hr />
-        <div id="search-facets"></div>
+        <div id="search-filters"></div>
       </div>
       <div class="col-12 col-md-9 mt-3">
         <div id="search-results"></div>
@@ -104,7 +104,7 @@
       </div>
     </div>
   </script>
-  <script type="text/template" id="facetsTemplate">
+  <script type="text/template" id="filtersTemplate">
     <div class="row mb-3">
       <div class="col-12">
         <p class="mb-0"><b>{{ name }}</b></p>
@@ -114,13 +114,13 @@
   </script>
   <script>
     var searchPath = "http://mysearch.local/js/json/results.json"
-    var facetsPath = "http://mysearch.local/js/json/facets.json"
+    var filtersPath = "http://mysearch.local/js/json/filters.json"
   </script>
   <script src="js/search-helpers.js"></script>
   <script src="js/search-order.js"></script>
   <script src="js/search-model.js"></script>
   <script src="js/search-view.js"></script>
-  <script src="js/search-facets.js"></script>
+  <script src="js/search.js"></script>
   <script type="text/javascript">
     jQuery(document).ready(
       jQuery().initializeSearch()

@@ -5,9 +5,9 @@
             SearchModel.searchData
         ), 'search-results')
         SearchView.displayList(SearchView.fillList(
-            SearchView.getTemplate("facetsTemplate"),
-            SearchModel.facetsData
-        ), 'search-facets')
+            SearchView.getTemplate("filtersTemplate"),
+            SearchModel.filtersData
+        ), 'search-filters')
         SearchView.createFacetEvents();
         SearchView.createSearchEvent();
     }

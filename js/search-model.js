@@ -9,9 +9,9 @@ var SearchModel = (function () {
 
     /**
      * Public property
-     * All facet items.
+     * All filter items.
      */
-    model.facetsData = getData(facetsPath)
+    model.filtersData = getData(filtersPath)
 
     /**
      * Private function

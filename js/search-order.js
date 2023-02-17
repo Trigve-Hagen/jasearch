@@ -66,8 +66,23 @@ var SearchOrder = (function (SearchHelpers) {
      * @param string itme
      *   The name of the facet or search.
      */
-    que.removeItem = function (item) {
-        que.searchQue = que.searchQue.filter(queItem => queItem != item)
+    que.removeItem = function (filters) {
+        // console.log(queItem.id + " - " + item.id)
+        /* if (que.searchQue.length == 1) {
+            que.searchQue = []
+        } else { */
+        // var newArray = []
+        que.searchQue = que.searchQue.filter(function (item) {
+            for (var key in filters) {
+                // console.log(item[key] + " - " + filters[key])
+                if (item[key] === undefined || item[key].toString() != filters[key].toString())
+                    return false
+            }
+            return true
+        });
+        console.log(JSON.stringify(que.searchQue))
+        // que.searchQue = que.searchQue.filter(queItem => queItem.id != item.id)
+        // }
     }
 
     /**

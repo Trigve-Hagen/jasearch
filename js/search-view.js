@@ -11,14 +11,14 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * Private helper function
      * Creates checkbox, radio and select form elements.
      *
-     * Creates facet form elements from the JSON data provided.
+     * Creates filter form elements from the JSON data provided.
      *
      * @param string type
      *   The type of element to ceate. Checkbox, radio or select.
      * @param string template
      *   The template created in index.html.
      * @param object data
-     *   An oject from JSON containing the facet data.
+     *   An oject from JSON containing the filter data.
      * 
      * @return string template
      */
@@ -66,7 +66,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param string template
      *   The template created in index.html.
      * @param object data
-     *   An oject from JSON containing the facet data.
+     *   An oject from JSON containing the filter data.
      * 
      * @return string template
      */
@@ -90,38 +90,33 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
 
     /**
      * Private helper function
-     * Filter the search when a facet is selected.
+     * Filter the search when a filter is selected.
      * Test all possibilities of none string conditions
      *
      * @param oject event
-     *   The facet's event object
-     * @param string facetsData
-     *   A JSON array of facet objects.
+     *   The filter's event object
+     * @param string filtersData
+     *   A JSON array of filter objects.
      * @param object searchData
      *   A JSON array of result objects.
      */
     function filterElements(event) {
-
-        // add facets to searchOrder
-        // go over facets in searchOrder and add rearch results to
-        // view.filteredData
-
-        SearchModel.facetsData.forEach(function (facetItem) {
-            facetItem.options.forEach(function (option) {
-                if (facetItem.type == "select") {
+        SearchModel.filtersData.forEach(function (filterItem) {
+            filterItem.options.forEach(function (option) {
+                if (filterItem.type == "select") {
                     // console.log(option + " - " + event.target.value)
                     if (SearchHelpers.createId(option) == event.target.value) {
                         SearchModel.searchData.forEach(function (searchItem) {
                             var keys = Object.keys(searchItem);
                             keys.forEach(function (key) {
-                                // console.log(SearchHelpers.createId(facetItem.name) + " - " + key)
-                                if (SearchHelpers.createId(facetItem.name) == key && searchItem[SearchHelpers.createId(facetItem.name)] == event.target.value) {
+                                // console.log(SearchHelpers.createId(filterItem.name) + " - " + key)
+                                if (SearchHelpers.createId(filterItem.name) == key && searchItem[SearchHelpers.createId(filterItem.name)] == event.target.value) {
                                     // view.filteredData.push(searchItem)
-                                    var queId = SearchHelpers.createId(facetItem.name) + "-" + SearchHelpers.createId(option)
+                                    var queId = SearchHelpers.createId(filterItem.name) + "-" + SearchHelpers.createId(option)
                                     if (!SearchOrder.ifExists(queId)) {
                                         SearchOrder.addItem({
                                             "id": queId,
-                                            "type": facetItem.type
+                                            "type": filterItem.type
                                         })
                                     }
                                     view.filteredData = view.buildFilteredData()
@@ -135,17 +130,18 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                         SearchModel.searchData.forEach(function (searchItem) {
                             var keys = Object.keys(searchItem);
                             keys.forEach(function (key) {
-                                // console.log(SearchHelpers.toCamelCase(facetItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(facetItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
-                                if (SearchHelpers.toCamelCase(facetItem.name) == key && searchItem[SearchHelpers.toCamelCase(facetItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
-                                    // console.log(facetItem.type)
+                                // console.log(SearchHelpers.toCamelCase(filterItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(filterItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
+                                if (SearchHelpers.toCamelCase(filterItem.name) == key && searchItem[SearchHelpers.toCamelCase(filterItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
+                                    // console.log(filterItem.type)
                                     // view.filteredData.push(searchItem)
-                                    var queId = SearchHelpers.toCamelCase(facetItem.name) + "-" + SearchHelpers.createId(option)
+                                    var queId = SearchHelpers.toCamelCase(filterItem.name) + "-" + SearchHelpers.createId(option)
                                     if (!SearchOrder.ifExists(queId)) {
                                         SearchOrder.addItem({
                                             "id": queId,
-                                            "type": facetItem.type
+                                            "type": filterItem.type
                                         })
                                     }
+                                    // switchState(queId, filterItem)
                                     view.filteredData = view.buildFilteredData()
                                 }
                             })
@@ -162,41 +158,21 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         ), 'search-results')
     }
 
-    /**
-     * Private helper function
-     * Creates Facet checkbox, radio and select form element change events.
-     *
-     * @param string type
-     *   The type of element to ceate. Checkbox, radio or select.
-     * @param object data
-     *   An oject from JSON containing the facet data.
-     */
-    function createFacetEvent(type, data) {
-        var id = SearchHelpers.toCamelCase(data.name)
-
-        // Get fresh data
-        // var facetsData = SearchModel.getData(facetsPath)
-        // var searchData = SearchModel.getData(searchPath)
-
-        if (type == 'select') {
-            var selectElm = document.getElementById(id)
-            selectElm.addEventListener('change', event => {
-                filterElements(event)
-            })
-        } else if (type == "button") {
-            data.options.forEach(function (item) {
-                var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
-                selectElm.addEventListener('click', event => {
-                    filterElements(event)
-                })
-            })
-        } else {
-            data.options.forEach(function (item) {
-                var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
-                selectElm.addEventListener('change', event => {
-                    filterElements(event)
-                })
-            })
+    function switchState(id, filter) {
+        switch (filter.type) {
+            case "button":
+                var selectElm = document.getElementById(id)
+                if (selectElm.className == filter.elementClasses) {
+                    selectElm.className = filter.elementClassesActive
+                } else {
+                    selectElm.className = filter.elementClasses
+                    if (SearchOrder.ifExists(id))
+                        SearchOrder.removeItem({
+                            "id": id,
+                            "type": filter.type
+                        })
+                }
+                break;
         }
     }
 
@@ -221,18 +197,34 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * Creates Facet checkbox, radio and select form element change events.
      *
      * @param JSON data
-     *   JSON containing facet data.
+     *   JSON containing filter data.
      */
     view.createFacetEvents = function () {
-        SearchModel.facetsData.forEach(function (element) {
-            switch (element.type) {
-                case 'select': template = createFacetEvent(element.type, element); break;
-                case 'checkbox': template = createFacetEvent(element.type, element); break;
-                case 'radio': template = createFacetEvent(element.type, element); break;
-                case 'button': template = createFacetEvent(element.type, element); break;
+        SearchModel.filtersData.forEach(function (element) {
+            var id = SearchHelpers.toCamelCase(element.name)
+
+            if (element.type == 'select') {
+                var selectElm = document.getElementById(id)
+                selectElm.addEventListener('change', event => {
+                    filterElements(event)
+                })
+            } else if (element.type == "button") {
+                element.options.forEach(function (item) {
+                    var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                    selectElm.addEventListener('click', event => {
+                        filterElements(event)
+                    })
+                })
+            } else {
+                element.options.forEach(function (item) {
+                    var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                    selectElm.addEventListener('change', event => {
+                        filterElements(event)
+                    })
+                })
             }
         })
-        var resetElm = document.getElementById("reset-facets")
+        var resetElm = document.getElementById("reset-filters")
         resetElm.addEventListener('click', event => {
             console.log(event.target.id)
         })
@@ -245,7 +237,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param string template
      *   The template created in index.html.
      * @param JSON dataArray
-     *   JSON containing search results or facet data.
+     *   JSON containing search results or filter data.
      * 
      * @return string list of populated templates
      */
@@ -291,7 +283,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * Builds the filteredData array from the searchOrderArray.
      *
      * @param string name
-     *   The name of the facet.
+     *   The name of the filter.
      * 
      * @param string value
      *   The value we want to keep in the results

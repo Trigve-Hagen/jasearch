@@ -40,7 +40,8 @@
     {
         "name": "Favorite Fruit",
         "type": "button",
-        "elementClasses": "btn btn-secondary",
+        "elementClasses": "btn btn-outline-secondary",
+        "elementClassesActive": "btn btn-secondary",
         "options": [
             "Apple",
             "Banana",
