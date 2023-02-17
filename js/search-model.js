@@ -1,7 +1,16 @@
 var SearchModel = (function () {
     var model = {}
 
+    /**
+     * Public property
+     * All search items.
+     */
     model.searchData = getData(searchPath)
+
+    /**
+     * Public property
+     * All facet items.
+     */
     model.facetsData = getData(facetsPath)
 
     /**

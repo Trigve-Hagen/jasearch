@@ -8,12 +8,6 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     view.filteredData = []
 
     /**
-     * Public property
-     * If initialized.
-     */
-    view.ifInitialized = false
-
-    /**
      * Private helper function
      * Creates checkbox, radio and select form elements.
      *
@@ -112,14 +106,14 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         // go over facets in searchOrder and add rearch results to
         // view.filteredData
 
-        SearchModel.facetsData.forEach(function (facetItem) { // Go through all facets
-            facetItem.options.forEach(function (option) { // Go through the facets options
+        SearchModel.facetsData.forEach(function (facetItem) {
+            facetItem.options.forEach(function (option) {
                 if (facetItem.type == "select") {
                     // console.log(option + " - " + event.target.value)
-                    if (SearchHelpers.createId(option) == event.target.value) { // get the one that matches the option value selected
-                        SearchModel.searchData.forEach(function (searchItem) { // iterate through the full list of search results (first iteration will be all results)
-                            var keys = Object.keys(searchItem); // Get all the JSON object keys
-                            keys.forEach(function (key) { // iterate over them
+                    if (SearchHelpers.createId(option) == event.target.value) {
+                        SearchModel.searchData.forEach(function (searchItem) {
+                            var keys = Object.keys(searchItem);
+                            keys.forEach(function (key) {
                                 // console.log(SearchHelpers.createId(facetItem.name) + " - " + key)
                                 if (SearchHelpers.createId(facetItem.name) == key && searchItem[SearchHelpers.createId(facetItem.name)] == event.target.value) {
                                     // view.filteredData.push(searchItem)
@@ -319,24 +313,6 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             return true
         });
 
-        console.log(JSON.stringify(newArray))
-        //console.log(queItem.type + " - " + SearchHelpers.getFilterName(queItem.id) + " - " + SearchHelpers.getFilterOption(queItem.id))
-        /* SearchModel.searchData.forEach(function (searchItem) {
-            if (searchItem[SearchHelpers.getFilterName(queItem.id)] == SearchHelpers.getFilterOption(queItem.id)) {
-                console.log(searchItem[SearchHelpers.getFilterName(queItem.id)] + " - " + SearchHelpers.getFilterOption(queItem.id))
-                newArray.push(searchItem)
-            }
-        })
-        var keys = Object.keys(item); // Get all the JSON object keys
-        keys.forEach(function (key) {
-            if (key == name) {
-                if (item[name] == value) newArray.push(item)
-            } else {
-                newArray.push(item)
-            }
-        }) */
-
-        // console.log(JSON.stringify(newArray))
         return newArray
     }
 
