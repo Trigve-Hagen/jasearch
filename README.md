@@ -6,12 +6,12 @@ js
 &emsp;json  
 &emsp;&emsp;facets.js  
 &emsp;&emsp;results.js  
-&emsp;search-facets.js The main controller  
-&emsp;search-helpers.js Helper functions  
-&emsp;search-model.js Loads the data via ajax from the paths in index.html.  
-&emsp;search-order.js Creates an array of search and/or filters in the order they are used.  
-&emsp;search-view.js Does most of the work. Creates filter events, handlers and builds the view using templates created in index.html.  
-index.html The entry point for the aaplication.    
+&emsp;search-facets.js - The main controller  
+&emsp;search-helpers.js  -Helper functions  
+&emsp;search-model.js - Loads the data via ajax from the paths in index.html.  
+&emsp;search-order.js - Creates an array of search and/or filters in the order they are used.  
+&emsp;search-view.js - Does most of the work. Creates filter events, handlers and builds the view using templates created in index.html.  
+index.html - The entry point for the aaplication.    
 README.md  
 
 Related Links  
