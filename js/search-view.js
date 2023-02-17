@@ -2,6 +2,18 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     var view = {}
 
     /**
+     * Public property
+     * An array of filtered search items.
+     */
+    view.filteredData = []
+
+    /**
+     * Public property
+     * If initialized.
+     */
+    view.ifInitialized = false
+
+    /**
      * Private helper function
      * Creates checkbox, radio and select form elements.
      *
@@ -94,19 +106,23 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param object searchData
      *   A JSON array of result objects.
      */
-    function filterElements(event, facetsData, searchData) {
-        var filteredData = []
-        facetsData.forEach(function (facetItem) {
-            facetItem.options.forEach(function (option) {
+    function filterElements(event) {
+
+        // add facets to searchOrder
+        // go over facets in searchOrder and add rearch results to
+        // view.filteredData
+
+        SearchModel.facetsData.forEach(function (facetItem) { // Go through all facets
+            facetItem.options.forEach(function (option) { // Go through the facets options
                 if (facetItem.type == "select") {
-                    //console.log(option + " - " + event.target.value)
-                    if (SearchHelpers.createId(option) == event.target.value) {
-                        searchData.forEach(function (searchItem) {
-                            var keys = Object.keys(searchItem);
-                            keys.forEach(function (key) {
+                    // console.log(option + " - " + event.target.value)
+                    if (SearchHelpers.createId(option) == event.target.value) { // get the one that matches the option value selected
+                        SearchModel.searchData.forEach(function (searchItem) { // iterate through the full list of search results (first iteration will be all results)
+                            var keys = Object.keys(searchItem); // Get all the JSON object keys
+                            keys.forEach(function (key) { // iterate over them
                                 // console.log(SearchHelpers.createId(facetItem.name) + " - " + key)
                                 if (SearchHelpers.createId(facetItem.name) == key && searchItem[SearchHelpers.createId(facetItem.name)] == event.target.value) {
-                                    filteredData.push(searchItem)
+                                    // view.filteredData.push(searchItem)
                                     var queId = SearchHelpers.createId(facetItem.name) + "-" + SearchHelpers.createId(option)
                                     if (!SearchOrder.ifExists(queId)) {
                                         SearchOrder.addItem({
@@ -114,6 +130,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                                             "type": facetItem.type
                                         })
                                     }
+                                    view.filteredData = view.buildFilteredData()
                                 }
                             })
                         })
@@ -121,13 +138,13 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                 } else {
                     // console.log(SearchHelpers.createId(option) + " - " + SearchHelpers.getFilterOption(event.target.id))
                     if (SearchHelpers.createId(option) == SearchHelpers.getFilterOption(event.target.id)) {
-                        searchData.forEach(function (searchItem) {
+                        SearchModel.searchData.forEach(function (searchItem) {
                             var keys = Object.keys(searchItem);
                             keys.forEach(function (key) {
                                 // console.log(SearchHelpers.toCamelCase(facetItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(facetItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
                                 if (SearchHelpers.toCamelCase(facetItem.name) == key && searchItem[SearchHelpers.toCamelCase(facetItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
                                     // console.log(facetItem.type)
-                                    filteredData.push(searchItem)
+                                    // view.filteredData.push(searchItem)
                                     var queId = SearchHelpers.toCamelCase(facetItem.name) + "-" + SearchHelpers.createId(option)
                                     if (!SearchOrder.ifExists(queId)) {
                                         SearchOrder.addItem({
@@ -135,6 +152,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                                             "type": facetItem.type
                                         })
                                     }
+                                    view.filteredData = view.buildFilteredData()
                                 }
                             })
                         })
@@ -146,7 +164,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         // display the filtered data
         view.displayList(view.fillList(
             view.getTemplate("resultsTemplate"),
-            filteredData
+            view.filteredData
         ), 'search-results')
     }
 
@@ -161,27 +179,28 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      */
     function createFacetEvent(type, data) {
         var id = SearchHelpers.toCamelCase(data.name)
+
         // Get fresh data
-        var facetsData = SearchModel.getData(facetsPath)
-        var searchData = SearchModel.getData(searchPath)
+        // var facetsData = SearchModel.getData(facetsPath)
+        // var searchData = SearchModel.getData(searchPath)
 
         if (type == 'select') {
             var selectElm = document.getElementById(id)
             selectElm.addEventListener('change', event => {
-                filterElements(event, facetsData, searchData)
+                filterElements(event)
             })
         } else if (type == "button") {
             data.options.forEach(function (item) {
                 var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                 selectElm.addEventListener('click', event => {
-                    filterElements(event, facetsData, searchData)
+                    filterElements(event)
                 })
             })
         } else {
             data.options.forEach(function (item) {
                 var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                 selectElm.addEventListener('change', event => {
-                    filterElements(event, facetsData, searchData)
+                    filterElements(event)
                 })
             })
         }
@@ -194,7 +213,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param JSON data
      *   JSON containing search results data.
      */
-    view.createSearchEvent = function (data) {
+    view.createSearchEvent = function () {
         var searchBtn = document.getElementById("search-submit")
         var searchInput = document.getElementById("search-input")
         searchBtn.addEventListener('click', event => {
@@ -210,8 +229,8 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param JSON data
      *   JSON containing facet data.
      */
-    view.createFacetEvents = function (data) {
-        data.forEach(function (element) {
+    view.createFacetEvents = function () {
+        SearchModel.facetsData.forEach(function (element) {
             switch (element.type) {
                 case 'select': template = createFacetEvent(element.type, element); break;
                 case 'checkbox': template = createFacetEvent(element.type, element); break;
@@ -271,6 +290,54 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     view.getTemplate = function (id) {
         var template = document.getElementById(id);
         return template.innerHTML;
+    }
+
+    /**
+     * Public function
+     * Builds the filteredData array from the searchOrderArray.
+     *
+     * @param string name
+     *   The name of the facet.
+     * 
+     * @param string value
+     *   The value we want to keep in the results
+     */
+    view.buildFilteredData = function () {
+        var newArray = []
+        var filters = {}
+        // create a filter object
+        SearchOrder.searchQue.forEach(function (queItem) {
+            filters[SearchHelpers.getFilterName(queItem.id)] = SearchHelpers.getFilterOption(queItem.id)
+        })
+
+        newArray = SearchModel.searchData.filter(function (item) {
+            for (var key in filters) {
+                // console.log(item[key] + " - " + filters[key])
+                if (item[key] === undefined || item[key].toString() != filters[key].toString())
+                    return false
+            }
+            return true
+        });
+
+        console.log(JSON.stringify(newArray))
+        //console.log(queItem.type + " - " + SearchHelpers.getFilterName(queItem.id) + " - " + SearchHelpers.getFilterOption(queItem.id))
+        /* SearchModel.searchData.forEach(function (searchItem) {
+            if (searchItem[SearchHelpers.getFilterName(queItem.id)] == SearchHelpers.getFilterOption(queItem.id)) {
+                console.log(searchItem[SearchHelpers.getFilterName(queItem.id)] + " - " + SearchHelpers.getFilterOption(queItem.id))
+                newArray.push(searchItem)
+            }
+        })
+        var keys = Object.keys(item); // Get all the JSON object keys
+        keys.forEach(function (key) {
+            if (key == name) {
+                if (item[name] == value) newArray.push(item)
+            } else {
+                newArray.push(item)
+            }
+        }) */
+
+        // console.log(JSON.stringify(newArray))
+        return newArray
     }
 
     return view;

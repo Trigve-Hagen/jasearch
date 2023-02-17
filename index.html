@@ -112,14 +112,16 @@
       </div>
     </div>
   </script>
+  <script>
+    var searchPath = "http://mysearch.local/js/json/results.json"
+    var facetsPath = "http://mysearch.local/js/json/facets.json"
+  </script>
   <script src="js/search-helpers.js"></script>
   <script src="js/search-order.js"></script>
   <script src="js/search-model.js"></script>
   <script src="js/search-view.js"></script>
   <script src="js/search-facets.js"></script>
   <script type="text/javascript">
-    var searchPath = "http://mysearch.local/js/json/results.json"
-    var facetsPath = "http://mysearch.local/js/json/facets.json"
     jQuery(document).ready(
       jQuery().initializeSearch()
     )

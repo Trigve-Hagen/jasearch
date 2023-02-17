@@ -81,5 +81,16 @@ var SearchOrder = (function (SearchHelpers) {
         que.searchQue = []
     }
 
+    /**
+     * Public function
+     * Searches onlyOnce array for a value.
+     *
+     * @param string element
+     *   The name of the element to look for.
+     */
+    que.existsInOnlyOnce = function (element) {
+        que.onlyOnce.includes(element)
+    }
+
     return que;
 }(SearchHelpers));

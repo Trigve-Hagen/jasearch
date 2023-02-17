@@ -1,16 +1,14 @@
 (function ($, SearchModel, SearchView, SearchHelpers) {
     $.fn.initializeSearch = function (args) {
-        var facetData = SearchModel.getData(facetsPath)
-        var searchData = SearchModel.getData(searchPath)
         SearchView.displayList(SearchView.fillList(
             SearchView.getTemplate("resultsTemplate"),
-            searchData
+            SearchModel.searchData
         ), 'search-results')
         SearchView.displayList(SearchView.fillList(
             SearchView.getTemplate("facetsTemplate"),
-            facetData
+            SearchModel.facetsData
         ), 'search-facets')
-        SearchView.createFacetEvents(facetData);
-        SearchView.createSearchEvent(searchData);
+        SearchView.createFacetEvents();
+        SearchView.createSearchEvent();
     }
 }(jQuery, SearchModel, SearchView, SearchHelpers))

@@ -1,15 +1,18 @@
 var SearchModel = (function () {
     var model = {}
 
+    model.searchData = getData(searchPath)
+    model.facetsData = getData(facetsPath)
+
     /**
-     * Public function
+     * Private function
      * Gets JSON data via AJAX.
      *
      * @param string path
      *   The path to retrieve the json either a function call in php script that returns
      *   JSON or a JSON file.
      */
-    model.getData = function (path) {
+    function getData(path) {
         return (function () {
             var json = null;
             $.ajax({
