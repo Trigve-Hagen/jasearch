@@ -1,5 +1,5 @@
-var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
-    var view = {}
+let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
+    let view = {}
 
     /**
      * Public property
@@ -22,33 +22,33 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * 
      * @return string template
      */
-    function createFormElement(type, template, data) {
-        var placeholder = "{{ element }}"
-        var id = SearchHelpers.toCamelCase(data.name)
-        var elementHtml = "<form>";
-        if (type == 'select') {
+    function createFormElement(template, data) {
+        let placeholder = "{{ element }}"
+        let id = SearchHelpers.toCamelCase(data.name)
+        let elementHtml = "<form>";
+        if (data.type == 'select') {
             elementHtml += '<select name="' + id + '" id="' + id + '" class="' + data.elementClasses + '">';
             data.options.forEach(function (item) {
                 elementHtml += '<option value="' + SearchHelpers.createId(item) + '" /> ' + item + '</option>';
             })
             elementHtml += '</select>';
-        } else if (type == "button") {
-            var prefix = data.prefix != "na" ? data.prefix : ""
-            var suffix = data.suffix != "na" ? data.suffix : ""
+        } else if (data.type == "button") {
+            let prefix = data.prefix != "na" ? data.prefix : ""
+            let suffix = data.suffix != "na" ? data.suffix : ""
             data.options.forEach(function (item) {
-                var optionId = id + "-" + SearchHelpers.createId(item)
+                let optionId = id + "-" + SearchHelpers.createId(item)
                 elementHtml += prefix
                 elementHtml += '<button type="button" id="' + optionId + '" class="' + data.elementClasses + '" /> ' + item + '</button>';
                 elementHtml += suffix
             })
         } else {
-            var prefix = data.prefix != "na" ? data.prefix : ""
-            var suffix = data.suffix != "na" ? data.suffix : ""
-            var labelClasses = data.labelClasses != "na" ? data.labelClasses : ""
+            let prefix = data.prefix != "na" ? data.prefix : ""
+            let suffix = data.suffix != "na" ? data.suffix : ""
+            let labelClasses = data.labelClasses != "na" ? data.labelClasses : ""
             data.options.forEach(function (item) {
-                var optionId = id + "-" + SearchHelpers.createId(item)
+                let optionId = id + "-" + SearchHelpers.createId(item)
                 elementHtml += prefix;
-                elementHtml += '<input type="' + type + '" class="' + data.elementClasses + '" name="' + id + '" id="' + optionId + '" />'
+                elementHtml += '<input type="' + data.type + '" class="' + data.elementClasses + '" name="' + id + '" id="' + optionId + '" />'
                 elementHtml += '<label class="' + labelClasses + '" for=' + optionId + '">' + item + '</label>';
                 elementHtml += suffix
             })
@@ -72,14 +72,14 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      */
     function fillTemplate(template, data) {
         switch (data.type) {
-            case 'select': template = createFormElement(data.type, template, data); break;
-            case 'checkbox': template = createFormElement(data.type, template, data); break;
-            case 'radio': template = createFormElement(data.type, template, data); break;
-            case 'button': template = createFormElement(data.type, template, data); break;
+            case 'select': template = createFormElement(template, data); break;
+            case 'checkbox': template = createFormElement(template, data); break;
+            case 'radio': template = createFormElement(template, data); break;
+            case 'button': template = createFormElement(template, data); break;
         }
         Object.keys(data).forEach(function (key) {
-            var placeholder = "{{ " + key + " }}"
-            var value = data[key]
+            let placeholder = "{{ " + key + " }}"
+            let value = data[key]
 
             while (template.indexOf(placeholder) !== -1) {
                 template = template.replace(placeholder, value)
@@ -107,12 +107,12 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     // console.log(option + " - " + event.target.value)
                     if (SearchHelpers.createId(option) == event.target.value) {
                         SearchModel.searchData.forEach(function (searchItem) {
-                            var keys = Object.keys(searchItem);
+                            let keys = Object.keys(searchItem);
                             keys.forEach(function (key) {
                                 // console.log(SearchHelpers.createId(filterItem.name) + " - " + key)
                                 if (SearchHelpers.createId(filterItem.name) == key && searchItem[SearchHelpers.createId(filterItem.name)] == event.target.value) {
                                     // view.filteredData.push(searchItem)
-                                    var queId = SearchHelpers.createId(filterItem.name) + "-" + SearchHelpers.createId(option)
+                                    let queId = SearchHelpers.createId(filterItem.name) + "-" + SearchHelpers.createId(option)
                                     if (!SearchOrder.ifExists(queId)) {
                                         SearchOrder.addItem({
                                             "id": queId,
@@ -128,13 +128,13 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     // console.log(SearchHelpers.createId(option) + " - " + SearchHelpers.getFilterOption(event.target.id))
                     if (SearchHelpers.createId(option) == SearchHelpers.getFilterOption(event.target.id)) {
                         SearchModel.searchData.forEach(function (searchItem) {
-                            var keys = Object.keys(searchItem);
+                            let keys = Object.keys(searchItem);
                             keys.forEach(function (key) {
                                 // console.log(SearchHelpers.toCamelCase(filterItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(filterItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
                                 if (SearchHelpers.toCamelCase(filterItem.name) == key && searchItem[SearchHelpers.toCamelCase(filterItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
                                     // console.log(filterItem.type)
                                     // view.filteredData.push(searchItem)
-                                    var queId = SearchHelpers.toCamelCase(filterItem.name) + "-" + SearchHelpers.createId(option)
+                                    let queId = SearchHelpers.toCamelCase(filterItem.name) + "-" + SearchHelpers.createId(option)
                                     if (!SearchOrder.ifExists(queId)) {
                                         SearchOrder.addItem({
                                             "id": queId,
@@ -161,7 +161,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     function switchState(id, filter) {
         switch (filter.type) {
             case "button":
-                var selectElm = document.getElementById(id)
+                let selectElm = document.getElementById(id)
                 if (selectElm.className == filter.elementClasses) {
                     selectElm.className = filter.elementClassesActive
                 } else {
@@ -184,8 +184,8 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      *   JSON containing search results data.
      */
     view.createSearchEvent = function () {
-        var searchBtn = document.getElementById("search-submit")
-        var searchInput = document.getElementById("search-input")
+        let searchBtn = document.getElementById("search-submit")
+        let searchInput = document.getElementById("search-input")
         searchBtn.addEventListener('click', event => {
             event.preventDefault()
             console.log(searchInput.value)
@@ -201,30 +201,30 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      */
     view.createFacetEvents = function () {
         SearchModel.filtersData.forEach(function (element) {
-            var id = SearchHelpers.toCamelCase(element.name)
+            let id = SearchHelpers.toCamelCase(element.name)
 
             if (element.type == 'select') {
-                var selectElm = document.getElementById(id)
+                let selectElm = document.getElementById(id)
                 selectElm.addEventListener('change', event => {
                     filterElements(event)
                 })
             } else if (element.type == "button") {
                 element.options.forEach(function (item) {
-                    var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                    let selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                     selectElm.addEventListener('click', event => {
                         filterElements(event)
                     })
                 })
             } else {
                 element.options.forEach(function (item) {
-                    var selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                    let selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                     selectElm.addEventListener('change', event => {
                         filterElements(event)
                     })
                 })
             }
         })
-        var resetElm = document.getElementById("reset-filters")
+        let resetElm = document.getElementById("reset-filters")
         resetElm.addEventListener('click', event => {
             console.log(event.target.id)
         })
@@ -242,7 +242,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @return string list of populated templates
      */
     view.fillList = function (template, dataArray) {
-        var listString = ""
+        let listString = ""
         dataArray.forEach(function (data) {
             listString += fillTemplate(template, data)
         })
@@ -259,7 +259,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      *   The id of the div to display the templates in.
      */
     view.displayList = function (resultsList, id) {
-        var results = document.getElementById(id)
+        let results = document.getElementById(id)
         results.innerHTML = resultsList
     }
 
@@ -274,7 +274,7 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      *   The id of the script that holds the templates.
      */
     view.getTemplate = function (id) {
-        var template = document.getElementById(id);
+        let template = document.getElementById(id);
         return template.innerHTML;
     }
 
@@ -289,15 +289,15 @@ var SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      *   The value we want to keep in the results
      */
     view.buildFilteredData = function () {
-        var newArray = []
-        var filters = {}
+        let newArray = []
+        let filters = {}
         // create a filter object
         SearchOrder.searchQue.forEach(function (queItem) {
             filters[SearchHelpers.getFilterName(queItem.id)] = SearchHelpers.getFilterOption(queItem.id)
         })
 
         newArray = SearchModel.searchData.filter(function (item) {
-            for (var key in filters) {
+            for (let key in filters) {
                 // console.log(item[key] + " - " + filters[key])
                 if (item[key] === undefined || item[key].toString() != filters[key].toString())
                     return false

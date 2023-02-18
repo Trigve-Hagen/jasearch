@@ -1,5 +1,5 @@
-var SearchOrder = (function (SearchHelpers) {
-    var que = {}
+let SearchOrder = (function (SearchHelpers) {
+    let que = {}
 
     /**
      * Public property
@@ -31,7 +31,7 @@ var SearchOrder = (function (SearchHelpers) {
      * @return bool
      */
     que.ifExists = function (item) {
-        var ifExists = false
+        let ifExists = false
         que.searchQue.forEach(function (elem) {
             if (item == elem.id) ifExists = true
         })
@@ -71,9 +71,9 @@ var SearchOrder = (function (SearchHelpers) {
         /* if (que.searchQue.length == 1) {
             que.searchQue = []
         } else { */
-        // var newArray = []
+        // let newArray = []
         que.searchQue = que.searchQue.filter(function (item) {
-            for (var key in filters) {
+            for (let key in filters) {
                 // console.log(item[key] + " - " + filters[key])
                 if (item[key] === undefined || item[key].toString() != filters[key].toString())
                     return false

@@ -1,5 +1,5 @@
-var SearchModel = (function () {
-    var model = {}
+let SearchModel = (function () {
+    let model = {}
 
     /**
      * Public property
@@ -23,7 +23,7 @@ var SearchModel = (function () {
      */
     function getData(path) {
         return (function () {
-            var json = null;
+            let json = null;
             $.ajax({
                 'async': false,
                 'global': false,

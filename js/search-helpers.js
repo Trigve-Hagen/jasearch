@@ -1,5 +1,5 @@
-var SearchHelpers = (function () {
-    var helper = {}
+let SearchHelpers = (function () {
+    let helper = {}
 
     /**
      * Public function
@@ -14,8 +14,8 @@ var SearchHelpers = (function () {
      *   The string convered to name-option
      */
     helper.createId = function (text) {
-        var parts = text.toLowerCase().split(" ")
-        var id = parts.join("-")
+        let parts = text.toLowerCase().split(" ")
+        let id = parts.join("-")
         return id
     }
 
