@@ -202,10 +202,6 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     selectElm.className = filter.elementClasses
                 }
                 break
-            case "checkbox":
-                break
-            default:
-                break
         }
     }
 
@@ -233,24 +229,35 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                                 "type": element.type
                             })
                         })
-                        console.log(SearchOrder.searchQue)
-                        view.filteredData = view.buildFilteredData()
-                        view.displayList(view.fillList(
-                            view.getTemplate("resultsTemplate"),
-                            view.filteredData
-                        ), 'search-results')
                         break
                     case 'checkbox':
                     case 'radio':
+                        element.options.forEach(function (item) {
+                            let elemId = id + "-" + SearchHelpers.toCamelCase(item)
+                            document.getElementById(elemId).checked = false;
+                            SearchOrder.removeItem({
+                                "id": elemId,
+                                "type": element.type
+                            })
+                        })
+                        break
                     case 'button':
                         element.options.forEach(function (item) {
-                            console.log(id + "-" + SearchHelpers.toCamelCase(item))
-                            let selectElm = document.getElementById(id + "-" + SearchHelpers.toCamelCase(item))
-                            console.log(selectElm.nodeName)
+                            let buttonId = id + "-" + SearchHelpers.toCamelCase(item)
+                            let buttonElm = document.getElementById(buttonId)
+                            buttonElm.className = element.elementClasses
+                            SearchOrder.removeItem({
+                                "id": buttonId,
+                                "type": element.type
+                            })
                         })
                         break
                 }
-
+                view.filteredData = view.buildFilteredData()
+                view.displayList(view.fillList(
+                    view.getTemplate("resultsTemplate"),
+                    view.filteredData
+                ), 'search-results')
                 // clear the form element
                 // erase the element in searchOrder
                 // display items
