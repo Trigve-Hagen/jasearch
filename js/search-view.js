@@ -175,7 +175,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     SearchModel.searchData.forEach(function (searchItem) {
                         let keys = Object.keys(searchItem);
                         keys.forEach(function (key) {
-                            console.log(SearchHelpers.toCamelCase(filterItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(filterItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
+                            // console.log(SearchHelpers.toCamelCase(filterItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(filterItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
                             if (SearchHelpers.toCamelCase(filterItem.name) == key && searchItem[SearchHelpers.toCamelCase(filterItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
                                 createSearchOrder(filterItem, option)
                             }
@@ -219,57 +219,74 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             let resetFilterElm = document.getElementById("reset-" + id)
             resetFilterElm.addEventListener('click', event => {
                 // console.log(JSON.stringify(event.target.id))
-                switch (element.type) {
-                    case 'select':
-                        let selectElm = document.getElementById(id)
-                        selectElm.selectedIndex = 0
-                        element.options.forEach(function (item) {
-                            SearchOrder.removeItem({
-                                "id": id + "-" + SearchHelpers.toCamelCase(item),
-                                "type": element.type
-                            })
-                        })
-                        break
-                    case 'checkbox':
-                    case 'radio':
-                        element.options.forEach(function (item) {
-                            let elemId = id + "-" + SearchHelpers.toCamelCase(item)
-                            document.getElementById(elemId).checked = false;
-                            SearchOrder.removeItem({
-                                "id": elemId,
-                                "type": element.type
-                            })
-                        })
-                        break
-                    case 'button':
-                        element.options.forEach(function (item) {
-                            let buttonId = id + "-" + SearchHelpers.toCamelCase(item)
-                            let buttonElm = document.getElementById(buttonId)
-                            buttonElm.className = element.elementClasses
-                            SearchOrder.removeItem({
-                                "id": buttonId,
-                                "type": element.type
-                            })
-                        })
-                        break
-                }
+                resetFilters(element, id)
+
                 view.filteredData = view.buildFilteredData()
                 view.displayList(view.fillList(
                     view.getTemplate("resultsTemplate"),
                     view.filteredData
                 ), 'search-results')
-                // clear the form element
-                // erase the element in searchOrder
-                // display items
             })
         })
         let resetFiltersElm = document.getElementById("reset-filters")
         resetFiltersElm.addEventListener('click', event => {
-            console.log(JSON.stringify(event.target.id))
-            // clear the form elements
-            // empty searchOrder
-            // display items
+            SearchModel.filtersData.forEach(function (element) {
+                let id = SearchHelpers.toCamelCase(element.name)
+                // console.log(JSON.stringify(event.target.id))
+                resetFilters(element, id)
+            })
+            view.filteredData = view.buildFilteredData()
+            view.displayList(view.fillList(
+                view.getTemplate("resultsTemplate"),
+                view.filteredData
+            ), 'search-results')
         })
+    }
+
+    /**
+     * Private function
+     * The switch statement that handles reseting filters.
+     *
+     * @param object element
+     *   The filter element to reset.
+     * @param string id
+     *   The id of the filter form element
+     */
+    function resetFilters(element, id) {
+        switch (element.type) {
+            case 'select':
+                let selectElm = document.getElementById(id)
+                selectElm.selectedIndex = 0
+                element.options.forEach(function (item) {
+                    SearchOrder.removeItem({
+                        "id": id + "-" + SearchHelpers.toCamelCase(item),
+                        "type": element.type
+                    })
+                })
+                break
+            case 'checkbox':
+            case 'radio':
+                element.options.forEach(function (item) {
+                    let elemId = id + "-" + SearchHelpers.toCamelCase(item)
+                    document.getElementById(elemId).checked = false;
+                    SearchOrder.removeItem({
+                        "id": elemId,
+                        "type": element.type
+                    })
+                })
+                break
+            case 'button':
+                element.options.forEach(function (item) {
+                    let buttonId = id + "-" + SearchHelpers.toCamelCase(item)
+                    let buttonElm = document.getElementById(buttonId)
+                    buttonElm.className = element.elementClasses
+                    SearchOrder.removeItem({
+                        "id": buttonId,
+                        "type": element.type
+                    })
+                })
+                break
+        }
     }
 
     /**
