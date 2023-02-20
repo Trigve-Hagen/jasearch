@@ -16,6 +16,7 @@
         "type": "select",
         "elementClasses": "form-select form-select-md mb-3",
         "options": [
+            "All",
             "Male",
             "Female"
         ],

@@ -8,7 +8,8 @@
             SearchView.getTemplate("filtersTemplate"),
             SearchModel.filtersData
         ), 'search-filters')
-        SearchView.createFacetEvents();
+        SearchView.createFilterEvents();
         SearchView.createSearchEvent();
+        SearchView.createResetEvents();
     }
 }(jQuery, SearchModel, SearchView, SearchHelpers))

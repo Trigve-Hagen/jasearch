@@ -105,9 +105,18 @@
     </div>
   </script>
   <script type="text/template" id="filtersTemplate">
+    <div class="row mb-1">
+      <div class="col-6">
+        <p class="mb-0 mt-3"><b>{{ name }}</b></p>
+      </div>
+      <div class="col-6">
+        <p class="mb-0 text-end">
+          {{ resetFilterButton }}
+        </p>
+      </div>
+    </div>
     <div class="row mb-3">
       <div class="col-12">
-        <p class="mb-0"><b>{{ name }}</b></p>
         {{ element }}
       </div>
     </div>

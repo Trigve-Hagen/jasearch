@@ -49,14 +49,31 @@ let SearchOrder = (function (SearchHelpers) {
      *   The name of the facet or search.
      */
     que.addItem = function (item) {
+        que.searchQue.push(item)
+    }
+
+    /**
+     * Public function
+     * Removes extra elemens from filters that can only have one item selected.
+     *
+     * @param string item
+     *   The name of the facet or search.
+     */
+    que.removeOnlyOnceItems = function (item) {
+        // console.log(JSON.stringify(item))
         que.onlyOnce.forEach(function (elem) {
-            if (item.type === elem) {
+            // console.log(item.type + " - " + elem + " & " + item.id.split("-")[0] + " - " + filterName)
+            if (item.type == elem) {
+                // console.log(item.type + " - " + elem)
                 que.searchQue.forEach(function (queItem) {
-                    if (queItem.type == item.type && SearchHelpers.getFilterName(queItem.id) == SearchHelpers.getFilterName(item.id)) que.removeItem(queItem)
+                    // console.log(queItem.type + " - " + item.type + " & " + SearchHelpers.getFilterName(queItem.id) + " - " + SearchHelpers.getFilterName(item.id))
+                    if (queItem.type == item.type && SearchHelpers.getFilterName(queItem.id) == SearchHelpers.getFilterName(item.id) && SearchHelpers.getFilterOption(queItem.id) != SearchHelpers.getFilterOption(item.id)) {
+                        console.log(JSON.stringify(queItem))
+                        que.removeItem(queItem)
+                    }
                 })
             }
         })
-        que.searchQue.push(item)
     }
 
     /**
@@ -75,12 +92,12 @@ let SearchOrder = (function (SearchHelpers) {
         que.searchQue = que.searchQue.filter(function (item) {
             for (let key in filters) {
                 // console.log(item[key] + " - " + filters[key])
-                if (item[key] === undefined || item[key].toString() != filters[key].toString())
+                if (item[key] === undefined || item[key].toString() == filters[key].toString())
                     return false
             }
             return true
         });
-        console.log(JSON.stringify(que.searchQue))
+        // console.log(JSON.stringify(que.searchQue))
         // que.searchQue = que.searchQue.filter(queItem => queItem.id != item.id)
         // }
     }
@@ -88,11 +105,8 @@ let SearchOrder = (function (SearchHelpers) {
     /**
      * Public function
      * Emptys the que.
-     *
-     * @param string id
-     *   The id of the script that holds the templates.
      */
-    que.emptyQue = function (id) {
+    que.emptyQue = function () {
         que.searchQue = []
     }
 
@@ -104,7 +118,7 @@ let SearchOrder = (function (SearchHelpers) {
      *   The name of the element to look for.
      */
     que.existsInOnlyOnce = function (element) {
-        que.onlyOnce.includes(element)
+        return que.onlyOnce.includes(element)
     }
 
     return que;

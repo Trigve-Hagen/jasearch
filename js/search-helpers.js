@@ -66,5 +66,21 @@ let SearchHelpers = (function () {
         return id.split("-")[1]
     }
 
+    /**
+     * Public function
+     * Checks if an element has a class.
+     * 
+     * @param object element
+     *   The element object
+     * @param string className
+     *   The class you are looking for.
+     * 
+     * @return bool
+     *   If the element has the class.
+     */
+    helper.hasClass = function (element, className) {
+        return (' ' + element.className + ' ').indexOf(' ' + className + ' ') > -1;
+    }
+
     return helper;
 }());

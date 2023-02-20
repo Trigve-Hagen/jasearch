@@ -13,8 +13,6 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      *
      * Creates filter form elements from the JSON data provided.
      *
-     * @param string type
-     *   The type of element to ceate. Checkbox, radio or select.
      * @param string template
      *   The template created in index.html.
      * @param object data
@@ -61,6 +59,26 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
 
     /**
      * Private helper function
+     * Creates reset filter button for checkbox, radio and select form elements.
+     *
+     * @param string template
+     *   The template created in index.html.
+     * @param object data
+     *   An oject from JSON containing the filter data.
+     * 
+     * @return string template
+     */
+    function createResetFilterButton(template, data) {
+        let placeholder = "{{ resetFilterButton }}"
+        let id = SearchHelpers.toCamelCase(data.name)
+        let elementHtml = '<button type="button" class="btn btn-outline-success" id="reset-' + id + '">Reset Filter</button>';
+
+        template = template.replace(placeholder, elementHtml)
+        return template
+    }
+
+    /**
+     * Private helper function
      * Fills in template placeholders by calling replace function.
      *
      * @param string template
@@ -72,10 +90,14 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      */
     function fillTemplate(template, data) {
         switch (data.type) {
-            case 'select': template = createFormElement(template, data); break;
-            case 'checkbox': template = createFormElement(template, data); break;
-            case 'radio': template = createFormElement(template, data); break;
-            case 'button': template = createFormElement(template, data); break;
+            case 'select':
+            case 'checkbox':
+            case 'radio':
+            case 'button':
+                template = createFormElement(template, data)
+                template = createResetFilterButton(template, data)
+                break
+            default: break
         }
         Object.keys(data).forEach(function (key) {
             let placeholder = "{{ " + key + " }}"
@@ -100,56 +122,68 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param object searchData
      *   A JSON array of result objects.
      */
-    function filterElements(event) {
-        SearchModel.filtersData.forEach(function (filterItem) {
+    function createSearchOrder(filterItem, option) {
+        let queId = SearchHelpers.toCamelCase(filterItem.name) + "-" + SearchHelpers.toCamelCase(option)
+        let filters = {
+            "id": queId,
+            "type": filterItem.type
+        }
+        if (SearchOrder.existsInOnlyOnce(filterItem.type)) {
+            SearchOrder.removeOnlyOnceItems(filters)
+        }
+        // console.log(JSON.stringify(filters))
+        if (!SearchOrder.ifExists(queId)) {
+            SearchOrder.addItem(filters)
+        }
+        switchState(queId, filterItem)
+        view.filteredData = view.buildFilteredData()
+    }
+
+    /**
+     * Private helper function
+     * Filter the search when a filter is selected.
+     * Test all possibilities of none string conditions
+     *
+     * @param oject event
+     *   The filter's event object
+     * @param string filtersData
+     *   A JSON array of filter objects.
+     * @param object searchData
+     *   A JSON array of result objects.
+     */
+    function filterElements(filterItem, event) {
+        if (filterItem.type == "select") {
             filterItem.options.forEach(function (option) {
-                if (filterItem.type == "select") {
-                    // console.log(option + " - " + event.target.value)
-                    if (SearchHelpers.createId(option) == event.target.value) {
-                        SearchModel.searchData.forEach(function (searchItem) {
-                            let keys = Object.keys(searchItem);
-                            keys.forEach(function (key) {
-                                // console.log(SearchHelpers.createId(filterItem.name) + " - " + key)
-                                if (SearchHelpers.createId(filterItem.name) == key && searchItem[SearchHelpers.createId(filterItem.name)] == event.target.value) {
-                                    // view.filteredData.push(searchItem)
-                                    let queId = SearchHelpers.createId(filterItem.name) + "-" + SearchHelpers.createId(option)
-                                    if (!SearchOrder.ifExists(queId)) {
-                                        SearchOrder.addItem({
-                                            "id": queId,
-                                            "type": filterItem.type
-                                        })
-                                    }
-                                    view.filteredData = view.buildFilteredData()
-                                }
-                            })
+                // console.log(option + " - " + event.target.value)
+                if (SearchHelpers.toCamelCase(option) == event.target.value) {
+                    // iterate through data
+                    SearchModel.searchData.forEach(function (searchItem) {
+                        let keys = Object.keys(searchItem);
+                        keys.forEach(function (key) {
+                            // console.log(SearchHelpers.createId(filterItem.name) + " - " + key)
+                            if (SearchHelpers.toCamelCase(filterItem.name) == key && searchItem[SearchHelpers.toCamelCase(filterItem.name)] == event.target.value) {
+                                createSearchOrder(filterItem, option)
+                            }
                         })
-                    }
-                } else {
-                    // console.log(SearchHelpers.createId(option) + " - " + SearchHelpers.getFilterOption(event.target.id))
-                    if (SearchHelpers.createId(option) == SearchHelpers.getFilterOption(event.target.id)) {
-                        SearchModel.searchData.forEach(function (searchItem) {
-                            let keys = Object.keys(searchItem);
-                            keys.forEach(function (key) {
-                                // console.log(SearchHelpers.toCamelCase(filterItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(filterItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
-                                if (SearchHelpers.toCamelCase(filterItem.name) == key && searchItem[SearchHelpers.toCamelCase(filterItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
-                                    // console.log(filterItem.type)
-                                    // view.filteredData.push(searchItem)
-                                    let queId = SearchHelpers.toCamelCase(filterItem.name) + "-" + SearchHelpers.createId(option)
-                                    if (!SearchOrder.ifExists(queId)) {
-                                        SearchOrder.addItem({
-                                            "id": queId,
-                                            "type": filterItem.type
-                                        })
-                                    }
-                                    // switchState(queId, filterItem)
-                                    view.filteredData = view.buildFilteredData()
-                                }
-                            })
-                        })
-                    }
+                    })
                 }
             })
-        })
+        } else {
+            filterItem.options.forEach(function (option) {
+                // console.log(SearchHelpers.createId(option) + " - " + SearchHelpers.getFilterOption(event.target.id))
+                if (SearchHelpers.createId(option) == SearchHelpers.getFilterOption(event.target.id)) {
+                    SearchModel.searchData.forEach(function (searchItem) {
+                        let keys = Object.keys(searchItem);
+                        keys.forEach(function (key) {
+                            console.log(SearchHelpers.toCamelCase(filterItem.name) + " - " + key + " & " + searchItem[SearchHelpers.toCamelCase(filterItem.name)] + " - " + SearchHelpers.getFilterOption(event.target.id))
+                            if (SearchHelpers.toCamelCase(filterItem.name) == key && searchItem[SearchHelpers.toCamelCase(filterItem.name)].toString() == SearchHelpers.getFilterOption(event.target.id)) {
+                                createSearchOrder(filterItem, option)
+                            }
+                        })
+                    })
+                }
+            })
+        }
         console.log(SearchOrder.searchQue)
         // display the filtered data
         view.displayList(view.fillList(
@@ -166,14 +200,69 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     selectElm.className = filter.elementClassesActive
                 } else {
                     selectElm.className = filter.elementClasses
-                    if (SearchOrder.ifExists(id))
-                        SearchOrder.removeItem({
-                            "id": id,
-                            "type": filter.type
-                        })
                 }
-                break;
+                break
+            case "checkbox":
+                break
+            default:
+                break
         }
+    }
+
+    /**
+     * Public function
+     * Creates reset button events.
+     *
+     * @param JSON data
+     *   JSON containing search results data.
+     */
+    view.createResetEvents = function () {
+        SearchModel.filtersData.forEach(function (element) {
+            let id = SearchHelpers.toCamelCase(element.name)
+
+            let resetFilterElm = document.getElementById("reset-" + id)
+            resetFilterElm.addEventListener('click', event => {
+                // console.log(JSON.stringify(event.target.id))
+                switch (element.type) {
+                    case 'select':
+                        let selectElm = document.getElementById(id)
+                        selectElm.selectedIndex = 0
+                        element.options.forEach(function (item) {
+                            SearchOrder.removeItem({
+                                "id": id + "-" + SearchHelpers.toCamelCase(item),
+                                "type": element.type
+                            })
+                        })
+                        console.log(SearchOrder.searchQue)
+                        view.filteredData = view.buildFilteredData()
+                        view.displayList(view.fillList(
+                            view.getTemplate("resultsTemplate"),
+                            view.filteredData
+                        ), 'search-results')
+                        break
+                    case 'checkbox':
+                    case 'radio':
+                    case 'button':
+                        element.options.forEach(function (item) {
+                            console.log(id + "-" + SearchHelpers.toCamelCase(item))
+                            let selectElm = document.getElementById(id + "-" + SearchHelpers.toCamelCase(item))
+                            console.log(selectElm.nodeName)
+                        })
+                        break
+                }
+
+                // clear the form element
+                // erase the element in searchOrder
+                // display items
+            })
+        })
+        let resetFiltersElm = document.getElementById("reset-filters")
+        resetFiltersElm.addEventListener('click', event => {
+            console.log(JSON.stringify(event.target.id))
+            // clear the form elements
+            // empty searchOrder
+            // display items
+        })
     }
 
     /**
@@ -194,39 +283,35 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
 
     /**
      * Public function
-     * Creates Facet checkbox, radio and select form element change events.
+     * Creates Filter checkbox, radio and select form element change events.
      *
      * @param JSON data
      *   JSON containing filter data.
      */
-    view.createFacetEvents = function () {
+    view.createFilterEvents = function () {
         SearchModel.filtersData.forEach(function (element) {
             let id = SearchHelpers.toCamelCase(element.name)
 
             if (element.type == 'select') {
                 let selectElm = document.getElementById(id)
                 selectElm.addEventListener('change', event => {
-                    filterElements(event)
+                    filterElements(element, event)
                 })
             } else if (element.type == "button") {
                 element.options.forEach(function (item) {
                     let selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                     selectElm.addEventListener('click', event => {
-                        filterElements(event)
+                        filterElements(element, event)
                     })
                 })
             } else {
                 element.options.forEach(function (item) {
                     let selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
                     selectElm.addEventListener('change', event => {
-                        filterElements(event)
+                        filterElements(element, event)
                     })
                 })
             }
-        })
-        let resetElm = document.getElementById("reset-filters")
-        resetElm.addEventListener('click', event => {
-            console.log(event.target.id)
         })
     }
 
@@ -282,11 +367,6 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * Public function
      * Builds the filteredData array from the searchOrderArray.
      *
-     * @param string name
-     *   The name of the filter.
-     * 
-     * @param string value
-     *   The value we want to keep in the results
      */
     view.buildFilteredData = function () {
         let newArray = []
