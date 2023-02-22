@@ -85,10 +85,6 @@ let SearchOrder = (function (SearchHelpers) {
      */
     que.removeItem = function (filters) {
         // console.log(queItem.id + " - " + item.id)
-        /* if (que.searchQue.length == 1) {
-            que.searchQue = []
-        } else { */
-        // let newArray = []
         que.searchQue = que.searchQue.filter(function (item) {
             for (let key in filters) {
                 // console.log(item[key] + " - " + filters[key])
@@ -97,9 +93,6 @@ let SearchOrder = (function (SearchHelpers) {
             }
             return true
         });
-        // console.log(JSON.stringify(que.searchQue))
-        // que.searchQue = que.searchQue.filter(queItem => queItem.id != item.id)
-        // }
     }
 
     /**

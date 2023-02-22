@@ -49,7 +49,7 @@ let SearchHelpers = (function () {
      *   The filter name.
      */
     helper.getFilterName = function (id) {
-        return id.split("-")[0]
+        return id.split(/-(.*)/s)[0]
     }
 
     /**
@@ -63,7 +63,7 @@ let SearchHelpers = (function () {
      *   The filter option.
      */
     helper.getFilterOption = function (id) {
-        return id.split("-")[1]
+        return id.split(/-(.*)/s)[1]
     }
 
     /**

@@ -135,7 +135,14 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         if (!SearchOrder.ifExists(queId)) {
             SearchOrder.addItem(filters)
         }
-        switchState(queId, filterItem)
+        if (filterItem.type == "button") {
+            let selectElm = document.getElementById(queId)
+            if (selectElm.className == filterItem.elementClasses) {
+                selectElm.className = filterItem.elementClassesActive
+            } else {
+                selectElm.className = filterItem.elementClasses
+            }
+        }
         view.filteredData = view.buildFilteredData()
     }
 
@@ -190,19 +197,6 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             view.getTemplate("resultsTemplate"),
             view.filteredData
         ), 'search-results')
-    }
-
-    function switchState(id, filter) {
-        switch (filter.type) {
-            case "button":
-                let selectElm = document.getElementById(id)
-                if (selectElm.className == filter.elementClasses) {
-                    selectElm.className = filter.elementClassesActive
-                } else {
-                    selectElm.className = filter.elementClasses
-                }
-                break
-        }
     }
 
     /**
@@ -301,7 +295,25 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         let searchInput = document.getElementById("search-input")
         searchBtn.addEventListener('click', event => {
             event.preventDefault()
-            console.log(searchInput.value)
+            if (searchInput.value != "") {
+                let filters = {
+                    "id": "search-" + searchInput.value,
+                    "type": "search"
+                }
+                if (SearchOrder.existsInOnlyOnce("search")) {
+                    SearchOrder.removeOnlyOnceItems(filters)
+                }
+                // console.log(JSON.stringify(filters))
+                if (!SearchOrder.ifExists("na")) {
+                    SearchOrder.addItem(filters)
+                }
+                console.log(SearchOrder.searchQue)
+                view.filteredData = view.buildFilteredData()
+                view.displayList(view.fillList(
+                    view.getTemplate("resultsTemplate"),
+                    view.filteredData
+                ), 'search-results')
+            }
         })
     }
 
@@ -389,27 +401,103 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
 
     /**
      * Public function
-     * Builds the filteredData array from the searchOrderArray.
+     * Builds the searchResults when a search is made.
      *
+     * @param object filter
+     *   The object used to identify id a search item fits the criteria as a result.
+     * @param integer iteration
+     *   Keeps track of the iteration through the searchQue.
+     * @param object array data
+     *   If the initial filtering is done then this is the data that made it through the 
+     *   last filtering.
+     * 
+     * @return array searchResults
+     *   The filtered data
+     */
+    function buildSearchData(filter, iteration, data) {
+        let searchResults = []
+        if (iteration == 0) {
+            SearchModel.searchData.forEach(function (item) {
+                // console.log(item[key] + " - " + filter[key])
+                for (let key in item) {
+                    if (item[key].toString().includes(filter.value.toString()))
+                        searchResults.push(item)
+                }
+            })
+        } else {
+            data.forEach(function (item) {
+                // console.log(item[key] + " - " + filter[key])
+                for (let key in item) {
+                    if (item[key].toString().includes(filter.value.toString()))
+                        searchResults.push(item)
+                }
+            })
+        }
+        return searchResults
+    }
+
+    /**
+     * Public function
+     * Builds the searchResults when a filter is used.
+     *
+     * @param object filter
+     *   The object used to identify id a search item fits the criteria as a result.
+     * @param integer iteration
+     *   Keeps track of the iteration through the searchQue.
+     * @param object array data
+     *   If the initial filtering is done then this is the data that made it through the 
+     *   last filtering.
+     * 
+     * @return array searchResults
+     *   The filtered data
+     */
+    function buildFilterData(filter, iteration, data) {
+        let searchResults = []
+        if (iteration == 0) {
+            SearchModel.searchData.forEach(function (item) {
+                // console.log(item[key] + " - " + filters[key])
+                if (item[filter.id].toString() == filter.value.toString())
+                    searchResults.push(item)
+            })
+        } else {
+            data.forEach(function (item) {
+                // console.log(item[key] + " - " + filters[key])
+                if (item[filter.id].toString() == filter.value.toString())
+                    searchResults.push(item)
+            })
+        }
+        return searchResults
+    }
+
+    /**
+     * Public function
+     * Builds the serch results.
+     *
+     * @return array searchResults
+     *   The filtered data
      */
     view.buildFilteredData = function () {
-        let newArray = []
-        let filters = {}
-        // create a filter object
+        let searchResults = []
+        let filters = []
         SearchOrder.searchQue.forEach(function (queItem) {
-            filters[SearchHelpers.getFilterName(queItem.id)] = SearchHelpers.getFilterOption(queItem.id)
+            filters.push({
+                "id": SearchHelpers.getFilterName(queItem.id),
+                "value": SearchHelpers.getFilterOption(queItem.id),
+                "type": queItem.type
+            })
         })
 
-        newArray = SearchModel.searchData.filter(function (item) {
-            for (let key in filters) {
-                // console.log(item[key] + " - " + filters[key])
-                if (item[key] === undefined || item[key].toString() != filters[key].toString())
-                    return false
-            }
-            return true
-        });
+        console.log("Filters: " + JSON.stringify(filters))
 
-        return newArray
+        let iteration = 0
+        filters.forEach(function (filter) {
+            if (filter.type == "search")
+                searchResults = buildSearchData(filter, iteration, searchResults)
+            else searchResults = buildFilterData(filter, iteration, searchResults)
+            iteration++
+        })
+
+        return searchResults
     }
 
     return view;

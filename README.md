@@ -1,6 +1,10 @@
 # JASearch
 A javaScript library for searching content using AJAX calls that return JSON. Also has support for facets using JSON. Under construction.
 
+All search results must have a unique id to filter results with. (filter algorithum uses id for filtering the results)  
+
+
+
 img  
 js  
 &emsp;json  
