@@ -132,16 +132,8 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             SearchOrder.removeOnlyOnceItems(filters)
         }
         // console.log(JSON.stringify(filters))
-        if (!SearchOrder.ifExists(queId)) {
+        if (!SearchHelpers.ifExists(SearchOrder.searchQue, filters)) {
             SearchOrder.addItem(filters)
-        }
-        if (filterItem.type == "button") {
-            let selectElm = document.getElementById(queId)
-            if (selectElm.className == filterItem.elementClasses) {
-                selectElm.className = filterItem.elementClassesActive
-            } else {
-                selectElm.className = filterItem.elementClasses
-            }
         }
         view.filteredData = view.buildFilteredData()
     }
@@ -161,7 +153,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     function filterElements(filterItem, event) {
         if (filterItem.type == "select") {
             filterItem.options.forEach(function (option) {
-                // console.log(option + " - " + event.target.value)
+                console.log(SearchHelpers.toCamelCase(option) + " - " + event.target.value)
                 if (SearchHelpers.toCamelCase(option) == event.target.value) {
                     // iterate through data
                     SearchModel.searchData.forEach(function (searchItem) {
@@ -304,7 +296,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     SearchOrder.removeOnlyOnceItems(filters)
                 }
                 // console.log(JSON.stringify(filters))
-                if (!SearchOrder.ifExists("na")) {
+                if (!SearchHelpers.ifExists(SearchOrder.searchQue, filters)) {
                     SearchOrder.addItem(filters)
                 }
                 console.log(SearchOrder.searchQue)
@@ -331,13 +323,37 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             if (element.type == 'select') {
                 let selectElm = document.getElementById(id)
                 selectElm.addEventListener('change', event => {
-                    filterElements(element, event)
+                    if (event.target.value == "all") {
+                        resetFilters(element, id)
+                        view.filteredData = view.buildFilteredData()
+                        view.displayList(view.fillList(
+                            view.getTemplate("resultsTemplate"),
+                            view.filteredData
+                        ), 'search-results')
+                    } else filterElements(element, event)
                 })
             } else if (element.type == "button") {
                 element.options.forEach(function (item) {
-                    let selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                    let elementId = id + "-" + SearchHelpers.createId(item)
+                    let selectElm = document.getElementById(elementId)
                     selectElm.addEventListener('click', event => {
                         filterElements(element, event)
+                        let selectElm = document.getElementById(elementId)
+                        if (selectElm.className == element.elementClasses) {
+                            selectElm.className = element.elementClassesActive
+                        } else {
+                            selectElm.className = element.elementClasses
+                            SearchOrder.removeItem({
+                                "id": elementId,
+                                "type": element.type
+                            })
+                            console.log(SearchOrder.searchQue)
+                            view.filteredData = view.buildFilteredData()
+                            view.displayList(view.fillList(
+                                view.getTemplate("resultsTemplate"),
+                                view.filteredData
+                            ), 'search-results')
+                        }
                     })
                 })
             } else {
@@ -438,6 +454,25 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
 
     /**
      * Public function
+     * Checks if a button or checkbox value is already in the resultsArray.
+     *
+     * @param object filter
+     *   The object used to identify id a search item fits the criteria as a result.
+     * @param integer iteration
+     *   Keeps track of the iteration through the searchQue.
+     * @param object array data
+     *   If the initial filtering is done then this is the data that made it through the 
+     *   last filtering.
+     * 
+     * @return array searchResults
+     *   The filtered data
+     */
+    function ifMultipleHasFilter() {
+        //
+    }
+
+    /**
+     * Public function
      * Builds the searchResults when a filter is used.
      *
      * @param object filter
@@ -455,13 +490,13 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         let searchResults = []
         if (iteration == 0) {
             SearchModel.searchData.forEach(function (item) {
-                // console.log(item[key] + " - " + filters[key])
+                // console.log(item[filter.id].toString() + " - " + filter.value.toString())
                 if (item[filter.id].toString() == filter.value.toString())
                     searchResults.push(item)
             })
         } else {
             data.forEach(function (item) {
-                // console.log(item[key] + " - " + filters[key])
+                // console.log(item[filter.id].toString() + " - " + filter.value.toString())
                 if (item[filter.id].toString() == filter.value.toString())
                     searchResults.push(item)
             })
@@ -487,17 +522,21 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             })
         })
 
-        console.log("Filters: " + JSON.stringify(filters))
+        // console.log("Filters: " + JSON.stringify(filters))
 
-        let iteration = 0
-        filters.forEach(function (filter) {
-            if (filter.type == "search")
-                searchResults = buildSearchData(filter, iteration, searchResults)
-            else searchResults = buildFilterData(filter, iteration, searchResults)
-            iteration++
-        })
+        if (filters.length === 0) {
+            return SearchModel.searchData
+        } else {
+            let iteration = 0
+            filters.forEach(function (filter) {
+                if (filter.type == "search")
+                    searchResults = buildSearchData(filter, iteration, searchResults)
+                else searchResults = buildFilterData(filter, iteration, searchResults)
+                iteration++
+            })
 
-        return searchResults
+            return searchResults
+        }
     }
 
     return view;

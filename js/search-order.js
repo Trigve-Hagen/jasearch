@@ -23,23 +23,6 @@ let SearchOrder = (function (SearchHelpers) {
 
     /**
      * Public function
-     * Checks if search or facet exists in que.
-     *
-     * @param string item
-     *   The name of the facet or search.
-     * 
-     * @return bool
-     */
-    que.ifExists = function (item) {
-        let ifExists = false
-        que.searchQue.forEach(function (elem) {
-            if (item == elem.id) ifExists = true
-        })
-        return ifExists
-    }
-
-    /**
-     * Public function
      * Add search or facet to que.
      * 
      * if another filter that can only be added once is in the que it is first erased.
@@ -83,15 +66,17 @@ let SearchOrder = (function (SearchHelpers) {
      * @param string itme
      *   The name of the facet or search.
      */
-    que.removeItem = function (filters) {
-        // console.log(queItem.id + " - " + item.id)
-        que.searchQue = que.searchQue.filter(function (item) {
-            for (let key in filters) {
-                // console.log(item[key] + " - " + filters[key])
-                if (item[key] === undefined || item[key].toString() == filters[key].toString())
-                    return false
+    que.removeItem = function (filter) {
+        let sQue = que.searchQue
+        que.searchQue = []
+        sQue.forEach(function (item) {
+            for (let key in filter) {
+                if (key == "id") {
+                    // console.log(item[key].toString() + " - " + filter[key].toString())
+                    if (item[key].toString() != filter[key].toString())
+                        que.searchQue.push(item)
+                }
             }
-            return true
         });
     }
 

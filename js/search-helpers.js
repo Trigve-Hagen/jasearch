@@ -82,5 +82,22 @@ let SearchHelpers = (function () {
         return (' ' + element.className + ' ').indexOf(' ' + className + ' ') > -1;
     }
 
+    /**
+     * Public function
+     * Checks if search or facet exists in que.
+     *
+     * @param string item
+     *   The name of the facet or search.
+     * 
+     * @return bool
+     */
+    helper.ifExists = function (itemsArray, item) {
+        let ifExists = false
+        itemsArray.forEach(function (elem) {
+            if (item.id == elem.id) ifExists = true
+        })
+        return ifExists
+    }
+
     return helper;
 }());
