@@ -82,6 +82,19 @@ let SearchOrder = (function (SearchHelpers) {
 
     /**
      * Public function
+     * Remove search from que.
+     */
+    que.removeSearch = function () {
+        let sQue = que.searchQue
+        que.searchQue = []
+        sQue.forEach(function (item) {
+            if (item["type"].toString() != "search")
+                que.searchQue.push(item)
+        });
+    }
+
+    /**
+     * Public function
      * Emptys the que.
      */
     que.emptyQue = function () {

@@ -71,7 +71,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     function createResetFilterButton(template, data) {
         let placeholder = "{{ resetFilterButton }}"
         let id = SearchHelpers.toCamelCase(data.name)
-        let elementHtml = '<button type="button" class="btn btn-outline-success" id="reset-' + id + '">Reset Filter</button>';
+        let elementHtml = '<button type="button" class="btn btn-outline-secondary" id="reset-' + id + '">Reset Filter</button>';
 
         template = template.replace(placeholder, elementHtml)
         return template
@@ -285,6 +285,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     view.createSearchEvent = function () {
         let searchBtn = document.getElementById("search-submit")
         let searchInput = document.getElementById("search-input")
+        let searchReset = document.getElementById("search-reset")
         searchBtn.addEventListener('click', event => {
             event.preventDefault()
             if (searchInput.value != "") {
@@ -306,6 +307,15 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     view.filteredData
                 ), 'search-results')
             }
+        })
+        searchReset.addEventListener('click', event => {
+            event.preventDefault()
+            SearchOrder.removeSearch()
+            view.filteredData = view.buildFilteredData()
+            view.displayList(view.fillList(
+                view.getTemplate("resultsTemplate"),
+                view.filteredData
+            ), 'search-results')
         })
     }
 
@@ -356,9 +366,31 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                         }
                     })
                 })
+            } else if (element.type == "checkbox") {
+                element.options.forEach(function (item) {
+                    let elementId = id + "-" + SearchHelpers.createId(item)
+                    let selectElm = document.getElementById(elementId)
+                    selectElm.addEventListener('change', event => {
+                        if (!event.target.checked) {
+                            SearchOrder.removeItem({
+                                "id": elementId,
+                                "type": element.type
+                            })
+                            console.log(SearchOrder.searchQue)
+                            view.filteredData = view.buildFilteredData()
+                            view.displayList(view.fillList(
+                                view.getTemplate("resultsTemplate"),
+                                view.filteredData
+                            ), 'search-results')
+                        } else {
+                            filterElements(element, event)
+                        }
+                    })
+                })
             } else {
                 element.options.forEach(function (item) {
-                    let selectElm = document.getElementById(id + "-" + SearchHelpers.createId(item))
+                    let elementId = id + "-" + SearchHelpers.createId(item)
+                    let selectElm = document.getElementById(elementId)
                     selectElm.addEventListener('change', event => {
                         filterElements(element, event)
                     })
@@ -454,25 +486,6 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
 
     /**
      * Public function
-     * Checks if a button or checkbox value is already in the resultsArray.
-     *
-     * @param object filter
-     *   The object used to identify id a search item fits the criteria as a result.
-     * @param integer iteration
-     *   Keeps track of the iteration through the searchQue.
-     * @param object array data
-     *   If the initial filtering is done then this is the data that made it through the 
-     *   last filtering.
-     * 
-     * @return array searchResults
-     *   The filtered data
-     */
-    function ifMultipleHasFilter() {
-        //
-    }
-
-    /**
-     * Public function
      * Builds the searchResults when a filter is used.
      *
      * @param object filter
@@ -488,6 +501,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      */
     function buildFilterData(filter, iteration, data) {
         let searchResults = []
+        let newButtonResults = []
         if (iteration == 0) {
             SearchModel.searchData.forEach(function (item) {
                 // console.log(item[filter.id].toString() + " - " + filter.value.toString())
@@ -495,6 +509,15 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     searchResults.push(item)
             })
         } else {
+            // look over the list of filters and check that the data list has elements with all filters
+            // look over the original list and make sure there is no new ones in there.
+            /* if (filter.type == "button" || filter.type == "checkbox")
+                SearchModel.searchData.forEach(function (item) {
+                    // console.log(item[filter.id].toString() + " - " + filter.value.toString())
+                    if (item[filter.id].toString() == filter.value.toString())
+                        newButtonResults.push(item)
+                })
+            else */
             data.forEach(function (item) {
                 // console.log(item[filter.id].toString() + " - " + filter.value.toString())
                 if (item[filter.id].toString() == filter.value.toString())
