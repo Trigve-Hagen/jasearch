@@ -8,7 +8,7 @@ All search results must have a unique id to filter results with. (filter algorit
 img  
 js  
 &emsp;json  
-&emsp;&emsp;facets.js  
+&emsp;&emsp;filters.js  
 &emsp;&emsp;results.js  
 &emsp;search-helpers.js - Helper functions.  
 &emsp;search-model.js - Loads the data via ajax from the paths in index.html.  
