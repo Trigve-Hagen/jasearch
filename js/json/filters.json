@@ -2,6 +2,7 @@
     {
         "name": "Is Active",
         "type": "radio",
+        "multipe": false,
         "elementClasses": "form-check-input",
         "options": [
             "True",
@@ -14,6 +15,7 @@
     {
         "name": "Gender",
         "type": "select",
+        "multipe": false,
         "elementClasses": "form-select form-select-md mb-3",
         "options": [
             "All",
@@ -27,6 +29,7 @@
     {
         "name": "Eye Color",
         "type": "checkbox",
+        "multipe": true,
         "elementClasses": "form-check-input",
         "options": [
             "Brown",
@@ -41,8 +44,9 @@
     {
         "name": "Favorite Fruit",
         "type": "button",
-        "elementClasses": "btn btn-outline-secondary",
-        "elementClassesActive": "btn btn-secondary",
+        "multipe": true,
+        "elementClasses": "btn btn-outline-success",
+        "elementClassesActive": "btn btn-success",
         "options": [
             "Apple",
             "Banana",

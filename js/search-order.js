@@ -1,58 +1,59 @@
 let SearchOrder = (function (SearchHelpers) {
-    let que = {}
+    let order = {}
 
     /**
      * Public property
-     * An array of search or facet objects. The que is to keep the order of
+     * An array of search or filter objects. searchOrder keeps the order of
      * the filters so the results are narrowed down as the filters
      * are added and expanded as the filters are removed relative to the
-     * search.
+     * search. This is not a list of results. This is the order in which the
+     * search and/or filters are selected.
      *
      * {
-     *  "id": "facetName-value"
+     *  "id": "filterName-value"
      *  "type": "select, checkbox, radio, button or search"
      * }
      */
-    que.searchQue = []
+    order.searchOrder = []
 
     /**
      * Public property
-     * The filters that can only be in the que once.
+     * The filters that can only be in searchOrder once.
      */
-    que.onlyOnce = ["select", "radio", "search"]
+    order.onlyOnce = ["select", "radio", "search"]
 
     /**
      * Public function
-     * Add search or facet to que.
+     * Add a search or filter to searchOrder.
      * 
-     * if another filter that can only be added once is in the que it is first erased.
+     * if another filter that can only be added once is in searchOrder it is first erased.
      * Then the new filter is added.
      *
      * @param string item
-     *   The name of the facet or search.
+     *   The name of the filter or search.
      */
-    que.addItem = function (item) {
-        que.searchQue.push(item)
+    order.addItem = function (item) {
+        order.searchOrder.push(item)
     }
 
     /**
      * Public function
-     * Removes extra elemens from filters that can only have one item selected.
+     * Removes extra elements of filters that can only have one item selected.
      *
      * @param string item
-     *   The name of the facet or search.
+     *   The name of the filter or search.
      */
-    que.removeOnlyOnceItems = function (item) {
+    order.removeOnlyOnceItems = function (item) {
         // console.log(JSON.stringify(item))
-        que.onlyOnce.forEach(function (elem) {
+        order.onlyOnce.forEach(function (elem) {
             // console.log(item.type + " - " + elem + " & " + item.id.split("-")[0] + " - " + filterName)
             if (item.type == elem) {
                 // console.log(item.type + " - " + elem)
-                que.searchQue.forEach(function (queItem) {
-                    // console.log(queItem.type + " - " + item.type + " & " + SearchHelpers.getFilterName(queItem.id) + " - " + SearchHelpers.getFilterName(item.id))
-                    if (queItem.type == item.type && SearchHelpers.getFilterName(queItem.id) == SearchHelpers.getFilterName(item.id) && SearchHelpers.getFilterOption(queItem.id) != SearchHelpers.getFilterOption(item.id)) {
-                        console.log(JSON.stringify(queItem))
-                        que.removeItem(queItem)
+                order.searchOrder.forEach(function (orderItem) {
+                    // console.log(orderItem.type + " - " + item.type + " & " + SearchHelpers.getFilterName(orderItem.id) + " - " + SearchHelpers.getFilterName(item.id))
+                    if (orderItem.type == item.type && SearchHelpers.getFilterName(orderItem.id) == SearchHelpers.getFilterName(item.id) && SearchHelpers.getFilterOption(orderItem.id) != SearchHelpers.getFilterOption(item.id)) {
+                        console.log(JSON.stringify(orderItem))
+                        order.removeItem(orderItem)
                     }
                 })
             }
@@ -61,20 +62,20 @@ let SearchOrder = (function (SearchHelpers) {
 
     /**
      * Public function
-     * Remove search or facet to que.
+     * Removes the search or filter from searchOrder.
      *
      * @param string itme
-     *   The name of the facet or search.
+     *   The name of the filter or search.
      */
-    que.removeItem = function (filter) {
-        let sQue = que.searchQue
-        que.searchQue = []
-        sQue.forEach(function (item) {
+    order.removeItem = function (filter) {
+        let sOrder = order.searchOrder
+        order.searchOrder = []
+        sOrder.forEach(function (item) {
             for (let key in filter) {
                 if (key == "id") {
                     // console.log(item[key].toString() + " - " + filter[key].toString())
                     if (item[key].toString() != filter[key].toString())
-                        que.searchQue.push(item)
+                        order.searchOrder.push(item)
                 }
             }
         });
@@ -82,23 +83,23 @@ let SearchOrder = (function (SearchHelpers) {
 
     /**
      * Public function
-     * Remove search from que.
+     * Remove the search in searchOrder.
      */
-    que.removeSearch = function () {
-        let sQue = que.searchQue
-        que.searchQue = []
-        sQue.forEach(function (item) {
+    order.removeSearch = function () {
+        let sOrder = order.searchOrder
+        order.searchOrder = []
+        sOrder.forEach(function (item) {
             if (item["type"].toString() != "search")
-                que.searchQue.push(item)
+                order.searchOrder.push(item)
         });
     }
 
     /**
      * Public function
-     * Emptys the que.
+     * Emptys searchOrder.
      */
-    que.emptyQue = function () {
-        que.searchQue = []
+    order.emptyOrder = function () {
+        order.searchOrder = []
     }
 
     /**
@@ -108,9 +109,9 @@ let SearchOrder = (function (SearchHelpers) {
      * @param string element
      *   The name of the element to look for.
      */
-    que.existsInOnlyOnce = function (element) {
-        return que.onlyOnce.includes(element)
+    order.existsInOnlyOnce = function (element) {
+        return order.onlyOnce.includes(element)
     }
 
-    return que;
+    return order;
 }(SearchHelpers));

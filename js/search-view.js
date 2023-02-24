@@ -132,7 +132,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
             SearchOrder.removeOnlyOnceItems(filters)
         }
         // console.log(JSON.stringify(filters))
-        if (!SearchHelpers.ifExists(SearchOrder.searchQue, filters)) {
+        if (!SearchHelpers.ifExists(SearchOrder.searchOrder, filters)) {
             SearchOrder.addItem(filters)
         }
         view.filteredData = view.buildFilteredData()
@@ -183,7 +183,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                 }
             })
         }
-        console.log(SearchOrder.searchQue)
+        console.log(SearchOrder.searchOrder)
         // display the filtered data
         view.displayList(view.fillList(
             view.getTemplate("resultsTemplate"),
@@ -297,10 +297,10 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                     SearchOrder.removeOnlyOnceItems(filters)
                 }
                 // console.log(JSON.stringify(filters))
-                if (!SearchHelpers.ifExists(SearchOrder.searchQue, filters)) {
+                if (!SearchHelpers.ifExists(SearchOrder.searchOrder, filters)) {
                     SearchOrder.addItem(filters)
                 }
-                console.log(SearchOrder.searchQue)
+                console.log(SearchOrder.searchOrder)
                 view.filteredData = view.buildFilteredData()
                 view.displayList(view.fillList(
                     view.getTemplate("resultsTemplate"),
@@ -357,7 +357,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                                 "id": elementId,
                                 "type": element.type
                             })
-                            console.log(SearchOrder.searchQue)
+                            console.log(SearchOrder.searchOrder)
                             view.filteredData = view.buildFilteredData()
                             view.displayList(view.fillList(
                                 view.getTemplate("resultsTemplate"),
@@ -376,7 +376,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
                                 "id": elementId,
                                 "type": element.type
                             })
-                            console.log(SearchOrder.searchQue)
+                            console.log(SearchOrder.searchOrder)
                             view.filteredData = view.buildFilteredData()
                             view.displayList(view.fillList(
                                 view.getTemplate("resultsTemplate"),
@@ -454,7 +454,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param object filter
      *   The object used to identify id a search item fits the criteria as a result.
      * @param integer iteration
-     *   Keeps track of the iteration through the searchQue.
+     *   Keeps track of the iteration through the searchOrder.
      * @param object array data
      *   If the initial filtering is done then this is the data that made it through the 
      *   last filtering.
@@ -491,7 +491,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      * @param object filter
      *   The object used to identify id a search item fits the criteria as a result.
      * @param integer iteration
-     *   Keeps track of the iteration through the searchQue.
+     *   Keeps track of the iteration through the searchOrder.
      * @param object array data
      *   If the initial filtering is done then this is the data that made it through the 
      *   last filtering.
@@ -501,7 +501,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
      */
     function buildFilterData(filter, iteration, data) {
         let searchResults = []
-        let newButtonResults = []
+        // let newButtonResults = []
         if (iteration == 0) {
             SearchModel.searchData.forEach(function (item) {
                 // console.log(item[filter.id].toString() + " - " + filter.value.toString())
@@ -537,7 +537,7 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
     view.buildFilteredData = function () {
         let searchResults = []
         let filters = []
-        SearchOrder.searchQue.forEach(function (queItem) {
+        SearchOrder.searchOrder.forEach(function (queItem) {
             filters.push({
                 "id": SearchHelpers.getFilterName(queItem.id),
                 "value": SearchHelpers.getFilterOption(queItem.id),
@@ -548,16 +548,23 @@ let SearchView = (function (SearchModel, SearchOrder, SearchHelpers) {
         // console.log("Filters: " + JSON.stringify(filters))
 
         if (filters.length === 0) {
+            // localStorage.setItem('searchResults', JSON.stringify(SearchModel.searchData));
             return SearchModel.searchData
         } else {
             let iteration = 0
             filters.forEach(function (filter) {
                 if (filter.type == "search")
                     searchResults = buildSearchData(filter, iteration, searchResults)
-                else searchResults = buildFilterData(filter, iteration, searchResults)
+                else {
+                    if (filter.type == "radio")
+                        searchResults = buildFilterData(filter, iteration, searchResults)
+                    else
+                        searchResults = buildFilterData(filter, iteration, searchResults)
+
+                }
                 iteration++
             })
-
+            // localStorage.setItem('searchResults', JSON.stringify(searchResults));
             return searchResults
         }
     }
